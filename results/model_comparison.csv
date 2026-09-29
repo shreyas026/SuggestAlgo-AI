@@ -1,0 +1,5 @@
+Model,Validation Accuracy,Validation Macro F1,Validation Weighted F1,Training Time (s)
+Logistic Regression,0.9893,0.9894,0.9892,3.0273
+Linear SVM,1.0,1.0,1.0,2.3826
+Naive Bayes,0.969,0.9691,0.9686,0.1047
+SGD Classifier,0.9952,0.9953,0.9952,1.339

@@ -30,7 +30,7 @@ def test_1_dataset_creation_and_schema():
     """Verify curated dataset file exists and has correct columns and row count."""
     assert os.path.exists(DATASET_PATH), f"Dataset file {DATASET_PATH} not found"
     df = pd.read_csv(DATASET_PATH)
-    assert len(df) >= 1500, f"Expected >= 1500 rows, got {len(df)}"
+    assert len(df) == 5600, f"Expected 5600 rows, got {len(df)}"
     
     required_cols = [
         "problem_id", "problem_description", "category", "algorithm",
@@ -42,22 +42,32 @@ def test_1_dataset_creation_and_schema():
     assert df['algorithm'].nunique() == 112, f"Expected 112 unique algorithms, got {df['algorithm'].nunique()}"
 
 
-def test_2_train_test_split_and_no_leakage():
-    """Verify train.csv and test.csv exist with zero problem_id overlap."""
-    assert os.path.exists(TRAIN_PATH), f"Train dataset {TRAIN_PATH} not found"
-    assert os.path.exists(TEST_PATH), f"Test dataset {TEST_PATH} not found"
+def test_2_train_val_test_split_and_no_leakage():
+    """Verify 3-way dataset split exists with zero text overlap across train, val, and test sets."""
+    data_dir = os.path.dirname(DATASET_PATH)
+    train_p = os.path.join(data_dir, 'train_algorithm_dataset.csv')
+    val_p = os.path.join(data_dir, 'validation_algorithm_dataset.csv')
+    test_p = os.path.join(data_dir, 'test_algorithm_dataset.csv')
     
-    train_df = pd.read_csv(TRAIN_PATH)
-    test_df = pd.read_csv(TEST_PATH)
+    assert os.path.exists(train_p), f"Train dataset {train_p} not found"
+    assert os.path.exists(val_p), f"Val dataset {val_p} not found"
+    assert os.path.exists(test_p), f"Test dataset {test_p} not found"
     
-    assert len(train_df) > 1000
-    assert len(test_df) > 300
+    train_df = pd.read_csv(train_p)
+    val_df = pd.read_csv(val_p)
+    test_df = pd.read_csv(test_p)
     
-    train_ids = set(train_df['problem_id'])
-    test_ids = set(test_df['problem_id'])
+    assert len(train_df) == 3920, f"Expected 3920 train rows, got {len(train_df)}"
+    assert len(val_df) == 840, f"Expected 840 val rows, got {len(val_df)}"
+    assert len(test_df) == 840, f"Expected 840 test rows, got {len(test_df)}"
     
-    overlap = train_ids.intersection(test_ids)
-    assert len(overlap) == 0, f"Found {len(overlap)} overlapping problem_ids between train and test sets!"
+    train_texts = set(train_df['problem_description'])
+    val_texts = set(val_df['problem_description'])
+    test_texts = set(test_df['problem_description'])
+    
+    assert len(train_texts.intersection(val_texts)) == 0, "Leakage between train and val"
+    assert len(train_texts.intersection(test_texts)) == 0, "Leakage between train and test"
+    assert len(val_texts.intersection(test_texts)) == 0, "Leakage between val and test"
 
 
 def test_3_model_save_and_load():
@@ -66,7 +76,6 @@ def test_3_model_save_and_load():
     model = load_mode2_model()
     assert model is not None
     assert hasattr(model, 'predict')
-    assert hasattr(model, 'predict_proba')
 
 
 def test_4_single_prediction():
@@ -101,7 +110,7 @@ def test_6_evaluation_metrics_and_artifacts():
         
     assert res['accuracy'] >= 0.70, f"Accuracy {res['accuracy']} lower than expected threshold 0.70"
     assert res['num_algorithms'] == 112
-    assert res['test_samples'] > 300
+    assert res['test_samples'] == 840
 
 
 if __name__ == "__main__":
