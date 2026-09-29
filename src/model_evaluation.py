@@ -95,8 +95,8 @@ def get_candidate_models(n_classes=2, n_samples=100, n_features=10):
     return models
 
 
-def evaluate_single_model(model, X_train, X_test, y_train, y_test, model_name, n_classes):
-    """Train and evaluate a single model with error handling."""
+def evaluate_single_model(model, X_train, X_test, y_train, y_test, model_name, n_classes, X_full=None, y_full=None):
+    """Train and evaluate a single model with 5-Fold Stratified CV and error handling."""
     result = {
         'algorithm': model_name,
         'status': 'success',
@@ -125,6 +125,16 @@ def evaluate_single_model(model, X_train, X_test, y_train, y_test, model_name, n
         result['trained_model'] = model
         result['predictions'] = y_pred
         
+        # 5-Fold Stratified Cross Validation
+        if X_full is not None and y_full is not None:
+            skf = StratifiedKFold(n_splits=5, shuffle=True, random_state=RANDOM_STATE)
+            cv_scores = cross_val_score(model, X_full, y_full, cv=skf, scoring='accuracy')
+            result['cv_accuracy_mean'] = round(float(np.mean(cv_scores)), 4)
+            result['cv_accuracy_std'] = round(float(np.std(cv_scores)), 4)
+        else:
+            result['cv_accuracy_mean'] = result['accuracy']
+            result['cv_accuracy_std'] = 0.0
+            
     except Exception as e:
         result['status'] = 'failed'
         result['error'] = str(e)
@@ -133,22 +143,15 @@ def evaluate_single_model(model, X_train, X_test, y_train, y_test, model_name, n
         result['recall'] = 0
         result['f1_score'] = 0
         result['training_time'] = 0
+        result['cv_accuracy_mean'] = 0
+        result['cv_accuracy_std'] = 0
     
     return result
 
 
 def evaluate_all_models(X, y, recommended_algo=None, test_size=0.3):
     """
-    Evaluate all candidate models on the dataset.
-    
-    Args:
-        X: Feature matrix
-        y: Target vector
-        recommended_algo: The algorithm recommended by meta-learning
-        test_size: Test set proportion
-        
-    Returns:
-        tuple: (results_dict, comparison_df, best_model_name)
+    Evaluate all candidate models on the dataset with 5-Fold Stratified Cross Validation.
     """
     n_classes = len(np.unique(y))
     n_samples, n_features = X.shape
@@ -163,7 +166,7 @@ def evaluate_all_models(X, y, recommended_algo=None, test_size=0.3):
     
     for name, model in models.items():
         result = evaluate_single_model(
-            model, X_train, X_test, y_train, y_test, name, n_classes
+            model, X_train, X_test, y_train, y_test, name, n_classes, X_full=X, y_full=y
         )
         results[name] = result
     
@@ -174,6 +177,8 @@ def evaluate_all_models(X, y, recommended_algo=None, test_size=0.3):
             comparison_data.append({
                 'Algorithm': name,
                 'Accuracy': result['accuracy'],
+                'CV Accuracy Mean': result['cv_accuracy_mean'],
+                'CV Accuracy Std': result['cv_accuracy_std'],
                 'Precision': result['precision'],
                 'Recall': result['recall'],
                 'F1 Score': result['f1_score'],
@@ -184,6 +189,8 @@ def evaluate_all_models(X, y, recommended_algo=None, test_size=0.3):
             comparison_data.append({
                 'Algorithm': name,
                 'Accuracy': 0,
+                'CV Accuracy Mean': 0,
+                'CV Accuracy Std': 0,
                 'Precision': 0,
                 'Recall': 0,
                 'F1 Score': 0,

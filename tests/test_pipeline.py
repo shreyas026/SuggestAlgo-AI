@@ -192,6 +192,34 @@ def test_error_handling():
     print("PASSED ✅")
 
 
+def test_nlp_mode2():
+    """Test Mode 2 natural-language problem & project idea algorithm recommendations."""
+    print("Testing Mode 2 NLP algorithm recommendation...", end=" ")
+    from src.nlp_recommendation import recommend_algorithm_from_text
+    
+    # 1. Coding problem search test
+    res_search = recommend_algorithm_from_text("I have a sorted array with 1M elements and need to find if a target exists")
+    assert res_search['top_recommendation'] is not None
+    assert res_search['top_score'] > 60.0
+    
+    # 2. Graph shortest path test
+    res_graph = recommend_algorithm_from_text("Find the shortest path between two cities in a weighted graph network")
+    assert res_graph['top_recommendation'] is not None
+    assert "Dijkstra" in res_graph['top_recommendation']['name'] or "Graph" in res_graph['top_recommendation']['category']
+    
+    # 3. Machine Learning project idea test
+    res_churn = recommend_algorithm_from_text("Predict customer churn for an e-commerce subscription dataset")
+    assert res_churn['analysis']['is_ml_project'] == True
+    assert res_churn['top_recommendation'] is not None
+    
+    # 4. Vague input follow-up questions test
+    res_vague = recommend_algorithm_from_text("I want to build a project")
+    assert res_vague['analysis']['is_vague'] == True
+    assert len(res_vague['analysis']['follow_up_questions']) > 0
+    
+    print("PASSED ✅")
+
+
 if __name__ == "__main__":
     print("=" * 60)
     print("SuggestAlgo AI — Running Tests")
@@ -207,6 +235,7 @@ if __name__ == "__main__":
         test_breast_cancer,
         test_wine,
         test_error_handling,
+        test_nlp_mode2,
     ]
     
     passed = 0

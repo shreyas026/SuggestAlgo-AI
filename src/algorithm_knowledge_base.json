@@ -1,0 +1,528 @@
+[
+  {
+    "id": "binary_search",
+    "name": "Binary Search",
+    "category": "Searching",
+    "description": "Efficient search algorithm that finds the position of a target value within a sorted array by repeatedly dividing the search interval in half.",
+    "problem_patterns": [
+      "sorted array lookup",
+      "find element in sorted list",
+      "search in logarithmic time",
+      "half search space",
+      "find square root or threshold",
+      "sorted data existence check"
+    ],
+    "data_structures": ["Array", "Sorted List"],
+    "requirements": ["Input array/list must be sorted in monotonic order"],
+    "time_complexity": "O(log n)",
+    "space_complexity": "O(1)",
+    "best_use_cases": [
+      "Searching in large sorted numerical arrays",
+      "Finding boundaries/thresholds in monotonic functions",
+      "Range lookup operations"
+    ],
+    "limitations": [
+      "Requires data to be pre-sorted or sorted on insertion",
+      "Not directly suitable for linked lists due to lack of random access"
+    ],
+    "alternatives": ["Linear Search", "Hash Table Lookup", "Binary Search Tree"],
+    "python_template": "def binary_search(arr, target):\n    left, right = 0, len(arr) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1"
+  },
+  {
+    "id": "linear_search",
+    "name": "Linear Search",
+    "category": "Searching",
+    "description": "Sequential search algorithm that checks every element in a list one by one until a match is found or the end is reached.",
+    "problem_patterns": [
+      "unsorted list search",
+      "find first occurrence",
+      "small dataset lookup",
+      "sequential search"
+    ],
+    "data_structures": ["Array", "Linked List"],
+    "requirements": ["None (works on unsorted or arbitrary data)"],
+    "time_complexity": "O(n)",
+    "space_complexity": "O(1)",
+    "best_use_cases": [
+      "Small or unsorted collections",
+      "Single-pass searches where sorting cost exceeds search cost"
+    ],
+    "limitations": [
+      "Inefficient for large datasets"
+    ],
+    "alternatives": ["Binary Search", "Hash Table Lookup"],
+    "python_template": "def linear_search(arr, target):\n    for idx, val in enumerate(arr):\n        if val == target:\n            return idx\n    return -1"
+  },
+  {
+    "id": "hash_table",
+    "name": "Hash Table / Dictionary Lookup",
+    "category": "Hashing",
+    "description": "Data structure that stores key-value pairs using a hash function for near-constant time lookups and insertions.",
+    "problem_patterns": [
+      "constant time lookup",
+      "frequency count",
+      "find duplicates",
+      "two sum problem",
+      "key value mapping",
+      "fast index matching"
+    ],
+    "data_structures": ["Hash Map", "Hash Set", "Dictionary"],
+    "requirements": ["Keys must be hashable and immutable"],
+    "time_complexity": "O(1) average, O(n) worst case",
+    "space_complexity": "O(n)",
+    "best_use_cases": [
+      "Repeated fast lookups",
+      "Element frequency counting",
+      "Caching and memoization"
+    ],
+    "limitations": [
+      "Unordered data storage",
+      "Hash collision handling overhead"
+    ],
+    "alternatives": ["Binary Search Tree", "Trie"],
+    "python_template": "def hash_lookup(arr, target):\n    lookup_map = {val: idx for idx, val in enumerate(arr)}\n    return lookup_map.get(target, -1)"
+  },
+  {
+    "id": "dijkstra",
+    "name": "Dijkstra's Shortest Path Algorithm",
+    "category": "Graph",
+    "description": "Graph search algorithm that solves the single-source shortest path problem for a graph with non-negative edge weights.",
+    "problem_patterns": [
+      "shortest path graph",
+      "minimum distance between cities",
+      "weighted graph routing",
+      "min cost path non negative weights",
+      "navigation pathfinding"
+    ],
+    "data_structures": ["Graph (Adjacency List)", "Priority Queue (Min-Heap)"],
+    "requirements": ["Graph edge weights must be non-negative"],
+    "time_complexity": "O((V + E) log V)",
+    "space_complexity": "O(V + E)",
+    "best_use_cases": [
+      "Road network navigation and GPS mapping",
+      "Network routing protocols (OSPF)",
+      "Weighted graph pathfinding"
+    ],
+    "limitations": [
+      "Fails or loops endlessly with negative edge weights"
+    ],
+    "alternatives": ["Bellman-Ford", "A* Search", "Breadth-First Search (BFS)"],
+    "python_template": "import heapq\n\ndef dijkstra(graph, start):\n    distances = {node: float('inf') for node in graph}\n    distances[start] = 0\n    pq = [(0, start)]\n    while pq:\n        curr_dist, u = heapq.heappop(pq)\n        if curr_dist > distances[u]:\n            continue\n        for v, weight in graph[u].items():\n            dist = curr_dist + weight\n            if dist < distances[v]:\n                distances[v] = dist\n                heapq.heappush(pq, (dist, v))\n    return distances"
+  },
+  {
+    "id": "bfs",
+    "name": "Breadth-First Search (BFS)",
+    "category": "Graph",
+    "description": "Traverses or searches graph/tree data structures layer-by-layer, finding shortest paths in unweighted graphs.",
+    "problem_patterns": [
+      "shortest path unweighted graph",
+      "level order traversal",
+      "connected components",
+      "nearest node search",
+      "flood fill"
+    ],
+    "data_structures": ["Queue", "Graph", "Tree"],
+    "requirements": ["Unweighted graph or uniform step cost"],
+    "time_complexity": "O(V + E)",
+    "space_complexity": "O(V)",
+    "best_use_cases": [
+      "Shortest path in unweighted graphs or grids",
+      "Social network connection degree search",
+      "Level-order tree traversal"
+    ],
+    "limitations": [
+      "High memory consumption for high-branching graphs"
+    ],
+    "alternatives": ["Depth-First Search (DFS)", "Dijkstra's Algorithm"],
+    "python_template": "from collections import deque\n\ndef bfs(graph, start):\n    visited = {start}\n    queue = deque([start])
+    traversal = []\n    while queue:\n        node = queue.popleft()\n        traversal.append(node)\n        for neighbor in graph[node]:\n            if neighbor not in visited:\n                visited.add(neighbor)\n                queue.append(neighbor)\n    return traversal"
+  },
+  {
+    "id": "dfs",
+    "name": "Depth-First Search (DFS)",
+    "category": "Graph",
+    "description": "Explores graph or tree branches as deep as possible before backtracking.",
+    "problem_patterns": [
+      "detect cycles in graph",
+      "topological sort precursor",
+      "path existence check",
+      "backtracking search",
+      "tree depth exploration"
+    ],
+    "data_structures": ["Stack / Recursion Call Stack", "Graph"],
+    "requirements": ["Visited tracker to prevent infinite loops in cyclic graphs"],
+    "time_complexity": "O(V + E)",
+    "space_complexity": "O(V)",
+    "best_use_cases": [
+      "Cycle detection in graphs",
+      "Solving mazes and puzzles via backtracking",
+      "Topological sorting"
+    ],
+    "limitations": [
+      "Does not guarantee shortest path in graphs"
+    ],
+    "alternatives": ["BFS", "Tarjan's Algorithm"],
+    "python_template": "def dfs(graph, start, visited=None):\n    if visited is None:\n        visited = set()\n    visited.add(start)\n    for neighbor in graph[start]:\n        if neighbor not in visited:\n            dfs(graph, neighbor, visited)\n    return visited"
+  },
+  {
+    "id": "quick_sort",
+    "name": "Quick Sort",
+    "category": "Sorting",
+    "description": "Divide-and-conquer sorting algorithm that partitions an array around a chosen pivot element.",
+    "problem_patterns": [
+      "fast in-place sorting",
+      "partition array",
+      "general purpose sorting",
+      "top k elements partitioning"
+    ],
+    "data_structures": ["Array"],
+    "requirements": ["Random or median-of-three pivot selection recommended"],
+    "time_complexity": "O(n log n) average, O(n^2) worst case",
+    "space_complexity": "O(log n)",
+    "best_use_cases": [
+      "General-purpose fast in-place sorting",
+      "Systems programming memory-constrained sorting"
+    ],
+    "limitations": [
+      "Unstable sort; worst-case O(n^2) on poorly chosen pivots"
+    ],
+    "alternatives": ["Merge Sort", "Heap Sort", "Timsort"],
+    "python_template": "def quick_sort(arr):\n    if len(arr) <= 1:\n        return arr\n    pivot = arr[len(arr) // 2]\n    left = [x for x in arr if x < pivot]\n    middle = [x for x in arr if x == pivot]\n    right = [x for x in arr if x > pivot]\n    return quick_sort(left) + middle + quick_sort(right)"
+  },
+  {
+    "id": "merge_sort",
+    "name": "Merge Sort",
+    "category": "Sorting",
+    "description": "Stable divide-and-conquer sorting algorithm that divides arrays into sub-arrays, sorts them, and merges them.",
+    "problem_patterns": [
+      "stable sorting required",
+      "external sorting large files",
+      "linked list sorting",
+      "count inversions"
+    ],
+    "data_structures": ["Array", "Linked List"],
+    "requirements": ["Requires O(n) auxiliary space for arrays"],
+    "time_complexity": "O(n log n) guaranteed",
+    "space_complexity": "O(n)",
+    "best_use_cases": [
+      "Stable sorting requirements",
+      "Sorting linked lists",
+      "External sorting of massive datasets"
+    ],
+    "limitations": [
+      "Requires extra memory for temporary merge arrays"
+    ],
+    "alternatives": ["Quick Sort", "Timsort"],
+    "python_template": "def merge_sort(arr):\n    if len(arr) <= 1:\n        return arr\n    mid = len(arr) // 2\n    left = merge_sort(arr[:mid])\n    right = merge_sort(arr[mid:])\n    return merge(left, right)\n\ndef merge(left, right):\n    result = []\n    i = j = 0\n    while i < len(left) and j < len(right):\n        if left[i] <= right[j]:\n            result.append(left[i]); i += 1\n        else:\n            result.append(right[j]); j += 1\n    result.extend(left[i:]); result.extend(right[j:])\n    return result"
+  },
+  {
+    "id": "two_pointers",
+    "name": "Two Pointers Technique",
+    "category": "Two Pointers",
+    "description": "Algorithmic pattern using two indices to iterate through a data structure simultaneously, typically from both ends or at different speeds.",
+    "problem_patterns": [
+      "two sum sorted array",
+      "palindrome verification",
+      "reverse array in place",
+      "remove duplicates sorted array",
+      "container with most water"
+    ],
+    "data_structures": ["Array", "String"],
+    "requirements": ["Data structure usually needs to be sorted or sequentially ordered"],
+    "time_complexity": "O(n)",
+    "space_complexity": "O(1)",
+    "best_use_cases": [
+      "Searching pairs in sorted arrays",
+      "In-place array modifications and reversals",
+      "Subarray/string boundary comparisons"
+    ],
+    "limitations": [
+      "Applies primarily to linear sequential memory structures"
+    ],
+    "alternatives": ["Hash Table Lookup", "Sliding Window"],
+    "python_template": "def two_sum_sorted(arr, target):\n    left, right = 0, len(arr) - 1\n    while left < right:\n        s = arr[left] + arr[right]\n        if s == target:\n            return (left, right)\n        elif s < target:\n            left += 1\n        else:\n            right -= 1\n    return None"
+  },
+  {
+    "id": "sliding_window",
+    "name": "Sliding Window Technique",
+    "category": "Sliding Window",
+    "description": "Maintains a dynamic or fixed range (window) over a sequential array or string to evaluate subarray properties efficiently.",
+    "problem_patterns": [
+      "max sum subarray size k",
+      "longest substring without repeating characters",
+      "min window substring",
+      "contiguous subarray sum"
+    ],
+    "data_structures": ["Array", "String", "Deque"],
+    "requirements": ["Problem requires contiguous subarray or substring evaluation"],
+    "time_complexity": "O(n)",
+    "space_complexity": "O(1) to O(k)",
+    "best_use_cases": [
+      "Fixed or variable size contiguous subarray problems",
+      "Substring search with constraints"
+    ],
+    "limitations": [
+      "Only applies when elements are contiguous"
+    ],
+    "alternatives": ["Two Pointers", "Prefix Sum"],
+    "python_template": "def max_sub_array_of_size_k(arr, k):\n    max_sum, window_sum, start = 0, 0, 0\n    for end in range(len(arr)):\n        window_sum += arr[end]\n        if end >= k - 1:\n            max_sum = max(max_sum, window_sum)\n            window_sum -= arr[start]\n            start += 1\n    return max_sum"
+  },
+  {
+    "id": "dynamic_programming",
+    "name": "Dynamic Programming (DP)",
+    "category": "Dynamic Programming",
+    "description": "Optimization method that solves complex problems by breaking them down into overlapping subproblems and storing subproblem solutions.",
+    "problem_patterns": [
+      "knapsack problem",
+      "longest common subsequence",
+      "edit distance",
+      "coin change problem",
+      "minimum cost path grid",
+      "fibonacci memoization"
+    ],
+    "data_structures": ["DP Table (1D/2D Array)", "Hash Table"],
+    "requirements": ["Optimal substructure and overlapping subproblems"],
+    "time_complexity": "O(n * m) or problem-dependent",
+    "space_complexity": "O(n * m) or O(n) space-optimized",
+    "best_use_cases": [
+      "Combinatorial optimization problems",
+      "Sequence alignment and string matching",
+      "Resource allocation with constraints"
+    ],
+    "limitations": [
+      "High memory usage if state space is large"
+    ],
+    "alternatives": ["Greedy Algorithms", "Memoized Recursion", "Branch and Bound"],
+    "python_template": "def coin_change(coins, amount):\n    dp = [float('inf')] * (amount + 1)\n    dp[0] = 0\n    for i in range(1, amount + 1):\n        for coin in coins:\n            if i >= coin:\n                dp[i] = min(dp[i], dp[coin] + 1)\n    return dp[amount] if dp[amount] != float('inf') else -1"
+  },
+  {
+    "id": "logistic_regression",
+    "name": "Logistic Regression",
+    "category": "Machine Learning",
+    "description": "Linear classification algorithm that models the probability of a discrete target outcome using a logistic sigmoid function.",
+    "problem_patterns": [
+      "binary classification baseline",
+      "customer churn prediction baseline",
+      "email spam classification baseline",
+      "interpretable classification probabilities",
+      "credit default prediction"
+    ],
+    "data_structures": ["Matrix", "Numpy Array", "Pandas Dataframe"],
+    "requirements": ["Features should be scaled; target must be categorical/binary"],
+    "time_complexity": "O(n * d) training",
+    "space_complexity": "O(d)",
+    "best_use_cases": [
+      "Linear binary/multiclass classification baselines",
+      "High interpretability requirements with feature odds ratios",
+      "Fast inference applications"
+    ],
+    "limitations": [
+      "Assumes linear decision boundary between classes"
+    ],
+    "alternatives": ["Random Forest Classifier", "Support Vector Machine", "XGBoost Classifier"],
+    "python_template": "from sklearn.linear_model import LogisticRegression\n\nmodel = LogisticRegression(max_iter=1000)\nmodel.fit(X_train, y_train)\npreds = model.predict(X_test)"
+  },
+  {
+    "id": "random_forest",
+    "name": "Random Forest Classifier",
+    "category": "Machine Learning",
+    "description": "Ensemble learning method that constructs a multitude of decision trees during training and outputs the mode of class predictions.",
+    "problem_patterns": [
+      "customer churn prediction",
+      "tabular data classification",
+      "fraud detection tabular",
+      "disease classification tabular",
+      "feature importance evaluation",
+      "handle missing categorical data"
+    ],
+    "data_structures": ["Decision Tree Forest", "Pandas Dataframe"],
+    "requirements": ["Tabular dataset with numerical or encoded categorical features"],
+    "time_complexity": "O(k * n * log n * d) training",
+    "space_complexity": "O(k * nodes)",
+    "best_use_cases": [
+      "General tabular classification problems",
+      "Datasets with non-linear feature interactions",
+      "Robustness against overfitting"
+    ],
+    "limitations": [
+      "Slower inference than single decision trees; larger model size"
+    ],
+    "alternatives": ["XGBoost Classifier", "Gradient Boosting Classifier", "Extra Trees Classifier"],
+    "python_template": "from sklearn.ensemble import RandomForestClassifier\n\nmodel = RandomForestClassifier(n_estimators=100, random_state=42)\nmodel.fit(X_train, y_train)\npreds = model.predict(X_test)"
+  },
+  {
+    "id": "xgboost",
+    "name": "XGBoost Classifier",
+    "category": "Machine Learning",
+    "description": "Optimized distributed gradient boosting library designed to be highly efficient, flexible, and accurate on tabular ML tasks.",
+    "problem_patterns": [
+      "kaggle competition tabular data",
+      "high accuracy customer churn",
+      "credit risk assessment",
+      "fraud detection high performance",
+      "gradient boosted trees tabular"
+    ],
+    "data_structures": ["Gradient Boosted Trees", "DMatrix"],
+    "requirements": ["Categorical variables encoded as numeric integers or one-hot vectors"],
+    "time_complexity": "O(k * n * log n * d) training",
+    "space_complexity": "O(k * nodes)",
+    "best_use_cases": [
+      "State-of-the-art predictive performance on tabular data",
+      "Large tabular classification and regression datasets"
+    ],
+    "limitations": [
+      "Requires careful hyperparameter tuning to prevent overfitting"
+    ],
+    "alternatives": ["Random Forest", "LightGBM", "Gradient Boosting"],
+    "python_template": "from xgboost import XGBClassifier\n\nmodel = XGBClassifier(n_estimators=100, eval_metric='logloss')\nmodel.fit(X_train, y_train)\npreds = model.predict(X_test)"
+  },
+  {
+    "id": "decision_tree",
+    "name": "Decision Tree Classifier",
+    "category": "Machine Learning",
+    "description": "Non-parametric supervised learning method that splits data based on feature thresholds creating a tree of decision rules.",
+    "problem_patterns": [
+      "simple interpretable decision rules",
+      "if then else classification rules",
+      "fast tree model baseline"
+    ],
+    "data_structures": ["Binary Tree"],
+    "requirements": ["Numerical or integer encoded categorical data"],
+    "time_complexity": "O(n * d * log n) training",
+    "space_complexity": "O(nodes)",
+    "best_use_cases": [
+      "Simple rule extraction and transparent decision logic",
+      "Quick baseline for decision boundaries"
+    ],
+    "limitations": [
+      "Prone to high variance and overfitting without pruning"
+    ],
+    "alternatives": ["Random Forest", "Extra Trees"],
+    "python_template": "from sklearn.tree import DecisionTreeClassifier\n\nmodel = DecisionTreeClassifier(max_depth=5)\nmodel.fit(X_train, y_train)\npreds = model.predict(X_test)"
+  },
+  {
+    "id": "svm",
+    "name": "Support Vector Machine (SVM / SVC)",
+    "category": "Machine Learning",
+    "description": "Finds a hyper-plane in an N-dimensional space that distinctly classifies data points with maximum margin.",
+    "problem_patterns": [
+      "medium dimension classification",
+      "gene expression classification",
+      "text classification small dataset",
+      "non linear kernel classification"
+    ],
+    "data_structures": ["Kernel Matrix", "Support Vectors"],
+    "requirements": ["Features MUST be standardized/scaled"],
+    "time_complexity": "O(n^2 * d) to O(n^3) training",
+    "space_complexity": "O(n_support_vectors * d)",
+    "best_use_cases": [
+      "High-dimensional datasets with clear margins",
+      "Small to medium sized complex classification datasets"
+    ],
+    "limitations": [
+      "Scales poorly to datasets with >50,000 samples"
+    ],
+    "alternatives": ["Logistic Regression", "Random Forest", "Kernel Ridge"],
+    "python_template": "from sklearn.svm import SVC\n\nmodel = SVC(kernel='rbf', probability=True)\nmodel.fit(X_train, y_train)\npreds = model.predict(X_test)"
+  },
+  {
+    "id": "collaborative_filtering",
+    "name": "Collaborative Filtering Recommendation",
+    "category": "Recommendation Systems",
+    "description": "Recommendation system technique that predicts user preferences based on past interactions of similar users (User-User or Item-Item).",
+    "problem_patterns": [
+      "movie recommendation system",
+      "product recommendation users like you",
+      "user item matrix factorization",
+      "e-commerce recommendations"
+    ],
+    "data_structures": ["User-Item Interaction Matrix", "Sparse Matrix"],
+    "requirements": ["User interaction matrix (ratings, clicks, or views)"],
+    "time_complexity": "O(U * I) matrix factorization",
+    "space_complexity": "O(U * I) or sparse representation",
+    "best_use_cases": [
+      "Movie, music, and e-commerce product recommendations",
+      "Personalized user feed generation"
+    ],
+    "limitations": [
+      "Cold-start problem for new users/items with no ratings"
+    ],
+    "alternatives": ["Content-Based Filtering", "Hybrid Recommender System", "Two-Tower Neural Nets"],
+    "python_template": "# Conceptual User-Item Matrix Factorization\nfrom sklearn.decomposition import NMF\n\nnmf = NMF(n_components=10)\nuser_features = nmf.fit_transform(user_item_matrix)\nitem_features = nmf.components_"
+  },
+  {
+    "id": "content_based_filtering",
+    "name": "Content-Based Recommendation",
+    "category": "Recommendation Systems",
+    "description": "Recommends items to a user based on the similarity between item descriptions/attributes and the user's historical profile.",
+    "problem_patterns": [
+      "recommend similar articles",
+      "movie metadata recommendation",
+      "item attribute matching",
+      "genre based movie recommendation"
+    ],
+    "data_structures": ["Item Profile Feature Vectors", "TF-IDF Matrix"],
+    "requirements": ["Rich item metadata and feature representations"],
+    "time_complexity": "O(N * d) cosine similarity match",
+    "space_complexity": "O(N * d)",
+    "best_use_cases": [
+      "Article/news recommendations",
+      "Overcoming cold-start for new items with detailed metadata"
+    ],
+    "limitations": [
+      "Tends to over-specialize and lack serendipity in recommendations"
+    ],
+    "alternatives": ["Collaborative Filtering", "Hybrid Recommender System"],
+    "python_template": "from sklearn.metrics.pairwise import cosine_similarity\n\nsimilarity_matrix = cosine_similarity(item_tfidf_matrix)"
+  },
+  {
+    "id": "bert_transformer",
+    "name": "Transformer / BERT NLP Classifier",
+    "category": "NLP",
+    "description": "Deep learning attention-based transformer model pre-trained on text corpora for contextual text understanding and classification.",
+    "problem_patterns": [
+      "sentiment analysis text",
+      "email spam classification deep learning",
+      "text intent classification",
+      "natural language understanding"
+    ],
+    "data_structures": ["Token Tensor", "Transformer Encoder"],
+    "requirements": ["GPU memory recommended for fine-tuning"],
+    "time_complexity": "O(L^2 * d) per transformer layer",
+    "space_complexity": "O(Model Parameters + L^2)",
+    "best_use_cases": [
+      "State-of-the-art text classification and sentiment analysis",
+      "Complex natural language parsing and context extraction"
+    ],
+    "limitations": [
+      "Computationally heavy; quadratic memory scaling with sequence length L"
+    ],
+    "alternatives": ["Naive Bayes", "TF-IDF + Logistic Regression", "LSTM"],
+    "python_template": "# HuggingFace Transformers pipeline\nfrom transformers import pipeline\n\nclassifier = pipeline('text-classification', model='distilbert-base-uncased')\nresult = classifier('Your text here')"
+  },
+  {
+    "id": "kmeans_clustering",
+    "name": "K-Means Clustering",
+    "category": "Optimization",
+    "description": "Unsupervised clustering algorithm that partitions n observations into k clusters in which each observation belongs to the cluster with the nearest mean.",
+    "problem_patterns": [
+      "customer segmentation",
+      "group similar data points",
+      "unsupervised pattern discovery",
+      "data quantization"
+    ],
+    "data_structures": ["Centroids Array", "Distance Matrix"],
+    "requirements": ["Number of clusters k must be specified; features scaled"],
+    "time_complexity": "O(k * n * d * iterations)",
+    "space_complexity": "O(k * d + n)",
+    "best_use_cases": [
+      "Customer segmentation and market analysis",
+      "Image quantization and color palette reduction"
+    ],
+    "limitations": [
+      "Sensitive to initial centroid placement and spherical cluster assumptions"
+    ],
+    "alternatives": ["DBSCAN", "Hierarchical Clustering", "Gaussian Mixture Models"],
+    "python_template": "from sklearn.cluster import KMeans\n\nkmeans = KMeans(n_clusters=3, random_state=42)\nlabels = kmeans.fit_predict(X)"
+  }
+]
