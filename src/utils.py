@@ -6,38 +6,67 @@ Helper functions used across the application.
 
 import pandas as pd
 import numpy as np
-from sklearn.datasets import load_iris, load_wine, load_breast_cancer
+from sklearn.datasets import load_iris, load_wine, load_breast_cancer, load_diabetes
 import os
 
 
 def get_sample_datasets():
-    """Get available sample datasets."""
+    """Get available sample datasets with detailed metadata dictionary."""
     return {
-        'Iris (Classification - 3 classes)': 'iris',
-        'Breast Cancer (Binary Classification)': 'breast_cancer',
-        'Wine (Classification - 3 classes)': 'wine',
+        'Iris Dataset': {
+            'id': 'iris',
+            'description': 'Classification - 3 classes, 150 samples',
+            'target': 'species',
+            'task': 'classification'
+        },
+        'Breast Cancer Dataset': {
+            'id': 'breast_cancer',
+            'description': 'Binary Classification - 2 classes, 569 samples',
+            'target': 'diagnosis',
+            'task': 'classification'
+        },
+        'Wine Dataset': {
+            'id': 'wine',
+            'description': 'Classification - 3 classes, 178 samples',
+            'target': 'wine_class',
+            'task': 'classification'
+        },
+        'Diabetes Dataset': {
+            'id': 'diabetes',
+            'description': 'Regression - 442 samples',
+            'target': 'target',
+            'task': 'regression'
+        }
     }
 
 
 def load_sample_dataset(dataset_name):
-    """Load a sample dataset and return as DataFrame."""
-    if dataset_name == 'iris':
+    """Load a sample dataset and return (df, target_column)."""
+    name_clean = str(dataset_name).lower()
+    
+    if 'iris' in name_clean:
         data = load_iris()
         df = pd.DataFrame(data.data, columns=data.feature_names)
         df['species'] = pd.Categorical.from_codes(data.target, data.target_names)
         return df, 'species'
     
-    elif dataset_name == 'breast_cancer':
+    elif 'breast_cancer' in name_clean or 'cancer' in name_clean:
         data = load_breast_cancer()
         df = pd.DataFrame(data.data, columns=data.feature_names)
         df['diagnosis'] = pd.Categorical.from_codes(data.target, data.target_names)
         return df, 'diagnosis'
     
-    elif dataset_name == 'wine':
+    elif 'wine' in name_clean:
         data = load_wine()
         df = pd.DataFrame(data.data, columns=data.feature_names)
         df['wine_class'] = data.target
         return df, 'wine_class'
+    
+    elif 'diabetes' in name_clean:
+        data = load_diabetes()
+        df = pd.DataFrame(data.data, columns=data.feature_names)
+        df['target'] = data.target
+        return df, 'target'
     
     return None, None
 

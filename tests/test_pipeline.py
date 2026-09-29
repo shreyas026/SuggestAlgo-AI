@@ -19,17 +19,30 @@ from src.preprocessing import preprocess_dataset
 from src.profiling import profile_dataset, format_profile_for_display
 from src.algorithm_selection import extract_meta_features, get_meta_learning_recommendation
 from src.model_evaluation import evaluate_all_models, get_candidate_models, detect_problem_type
-from src.utils import load_sample_dataset
+from src.utils import load_sample_dataset, get_sample_datasets
 
 
 def test_data_loading():
     """Test dataset loading and validation."""
     print("Testing data loading...", end=" ")
     
+    samples = get_sample_datasets()
+    assert isinstance(samples, dict), "get_sample_datasets should return a dict"
+    for name, info in samples.items():
+        assert 'description' in info, f"Missing description in sample {name}"
+        assert 'id' in info, f"Missing id in sample {name}"
+        assert 'target' in info, f"Missing target in sample {name}"
+    
     df, target = load_sample_dataset('iris')
     assert df is not None, "Failed to load iris dataset"
     assert df.shape[0] == 150, f"Expected 150 rows, got {df.shape[0]}"
     assert target == 'species', f"Expected 'species' target, got {target}"
+    
+    # Test regression sample dataset
+    df_reg, target_reg = load_sample_dataset('diabetes')
+    assert df_reg is not None, "Failed to load diabetes dataset"
+    assert df_reg.shape[0] == 442, f"Expected 442 rows for diabetes, got {df_reg.shape[0]}"
+    assert target_reg == 'target', f"Expected 'target' column for diabetes, got {target_reg}"
     
     num_cols, cat_cols = detect_column_types(df)
     assert len(num_cols) == 4, f"Expected 4 numerical cols, got {len(num_cols)}"

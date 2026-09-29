@@ -225,10 +225,11 @@ def render_mode_1_dataset():
                 options=list(sample_options.keys()),
                 format_func=lambda x: f"{x} ({sample_options[x]['description']})"
             )
-            df = load_sample_dataset(selected_sample)
+            sample_info = sample_options[selected_sample]
+            df, default_target = load_sample_dataset(sample_info['id'])
             dataset_name = selected_sample
             target_candidates = get_target_candidates(df)
-            default_target = sample_options[selected_sample]['target']
+            default_target = sample_info.get('target', default_target)
             target_idx = target_candidates.index(default_target) if default_target in target_candidates else 0
             target_col = st.selectbox("Select Target Column", target_candidates, index=target_idx)
 
