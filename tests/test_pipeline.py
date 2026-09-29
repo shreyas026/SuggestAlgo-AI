@@ -1,8 +1,9 @@
 """
 SuggestAlgo AI - Basic Tests
 
-Tests core pipeline components: data loading, preprocessing, 
-meta-feature extraction, algorithm selection, and model evaluation.
+Tests core pipeline components: data loading, preprocessing,
+meta-feature extraction, algorithm selection, model evaluation,
+regression pipeline, and NLP recommendation (Mode 2).
 """
 
 import sys
@@ -17,7 +18,7 @@ from src.data_loader import detect_column_types, get_target_candidates, validate
 from src.preprocessing import preprocess_dataset
 from src.profiling import profile_dataset, format_profile_for_display
 from src.algorithm_selection import extract_meta_features, get_meta_learning_recommendation
-from src.model_evaluation import evaluate_all_models, get_candidate_models
+from src.model_evaluation import evaluate_all_models, get_candidate_models, detect_problem_type
 from src.utils import load_sample_dataset
 
 
@@ -102,18 +103,19 @@ def test_meta_features():
 def test_algorithm_selection():
     """Test meta-learning algorithm selection."""
     print("Testing algorithm selection...", end=" ")
-    
+
     df, target = load_sample_dataset('iris')
     X, y, feature_names, target_le, prep_info = preprocess_dataset(df, target)
     meta = extract_meta_features(X, y)
-    
+
+    # get_meta_learning_recommendation returns (recommended_algo_name, confidence_info)
     recommended, confidence_info = get_meta_learning_recommendation(meta)
-    
+
     assert recommended is not None, "Should recommend an algorithm"
-    assert isinstance(recommended, str)
+    assert isinstance(recommended, str), "Recommended should be a string"
     assert confidence_info['confidence'] > 0, "Confidence should be positive"
-    assert len(confidence_info['neighbor_algorithms']) > 0
-    
+    assert len(confidence_info['neighbor_algorithms']) > 0, "Should have neighbor algorithms"
+
     print(f"PASSED ✅ (Recommended: {recommended}, Confidence: {confidence_info['confidence']:.1f}%)")
 
 
@@ -220,6 +222,80 @@ def test_nlp_mode2():
     print("PASSED ✅")
 
 
+def test_detect_problem_type():
+    """Test problem type auto-detection."""
+    print("Testing detect_problem_type...", end=" ")
+
+    # Integer target with few unique values → classification
+    y_clf = np.array([0, 1, 2, 0, 1, 2, 0, 1])
+    assert detect_problem_type(y_clf) == 'classification', "Should detect classification"
+
+    # Float target with many unique values → regression
+    y_reg = np.array([1.5, 2.3, 3.7, 4.1, 5.6, 2.2, 8.9, 10.1, 7.4, 6.0,
+                      11.2, 12.8, 9.5, 3.3, 4.7, 15.1, 14.0, 13.3, 16.7, 18.0,
+                      20.1, 22.5, 21.0, 19.3, 17.6, 25.0, 24.0, 23.1, 28.4, 30.0])
+    assert detect_problem_type(y_reg) == 'regression', "Should detect regression"
+
+    print("PASSED ✅")
+
+
+def test_regression_pipeline():
+    """Test full regression pipeline with a synthetic dataset."""
+    print("Testing regression pipeline...", end=" ")
+
+    # Create a synthetic regression dataset
+    rng = np.random.RandomState(42)
+    n_samples = 200
+    X_raw = rng.randn(n_samples, 5)
+    y_raw = (3.0 * X_raw[:, 0] + 1.5 * X_raw[:, 1] - 2.0 * X_raw[:, 2]
+             + rng.randn(n_samples) * 0.5)
+
+    df_reg = pd.DataFrame(X_raw, columns=['feat_a', 'feat_b', 'feat_c', 'feat_d', 'feat_e'])
+    df_reg['price'] = y_raw  # continuous float target → regression
+
+    target_col = 'price'
+
+    # Detect problem type
+    raw_y = df_reg[target_col].values
+    pt = detect_problem_type(raw_y)
+    assert pt == 'regression', f"Expected 'regression', got '{pt}'"
+
+    # Preprocess
+    X_proc, y_proc, feat_names, label_enc, prep_info = preprocess_dataset(
+        df_reg, target_col, problem_type='regression'
+    )
+    assert label_enc is None, "LabelEncoder should be None for regression"
+    assert prep_info['problem_type'] == 'regression'
+    assert X_proc.shape[0] == n_samples
+
+    # Evaluate
+    results, comparison_df, best_model_name, split_data = evaluate_all_models(
+        X_proc, y_proc, problem_type='regression'
+    )
+
+    # At least some regression models should succeed
+    successful = sum(1 for r in results.values() if r['status'] == 'success')
+    assert successful >= 3, f"At least 3 regression models should succeed, got {successful}"
+
+    # Best model identified
+    assert best_model_name is not None, "Best regression model should be identified"
+
+    # Check correct regression metrics are present
+    best_result = results[best_model_name]
+    assert 'r2' in best_result, "R² metric should be present for regression"
+    assert 'mae' in best_result, "MAE metric should be present for regression"
+    assert 'rmse' in best_result, "RMSE metric should be present for regression"
+    assert 'f1_score' not in best_result, "f1_score should NOT be present for regression"
+    assert 'accuracy' not in best_result, "accuracy should NOT be present for regression"
+
+    # Comparison DataFrame should have regression columns
+    assert 'R² Score' in comparison_df.columns, "DataFrame should have R² Score column"
+    assert 'RMSE' in comparison_df.columns, "DataFrame should have RMSE column"
+    assert 'MAE' in comparison_df.columns, "DataFrame should have MAE column"
+
+    print(f"PASSED ✅ (Best: {best_model_name}, R²: {best_result['r2']:.4f})")
+
+
 if __name__ == "__main__":
     print("=" * 60)
     print("SuggestAlgo AI — Running Tests")
@@ -236,6 +312,8 @@ if __name__ == "__main__":
         test_wine,
         test_error_handling,
         test_nlp_mode2,
+        test_detect_problem_type,
+        test_regression_pipeline,
     ]
     
     passed = 0
