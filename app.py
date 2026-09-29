@@ -45,251 +45,467 @@ from src.mode2_ml_model import predict_top_k_algorithms, load_mode2_model
 
 
 # ============================================================================
-# PAGE CONFIGURATION & PREMIUM DESIGN SYSTEM
+# PAGE CONFIGURATION & EDITORIAL CREAM DESIGN SYSTEM
 # ============================================================================
 
 st.set_page_config(
     page_title="SuggestAlgo AI — Intelligent Algorithm Selection",
-    page_icon="🧠",
+    page_icon="✦",
     layout="wide",
     initial_sidebar_state="collapsed"
 )
 
-# Custom High-End Developer Interface CSS
+# Custom High-End Editorial Cream CSS with Fluid Motion
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
     :root {
-        --bg-primary: #08090D;
-        --bg-surface: #111318;
-        --bg-elevated: #171A21;
-        --border-subtle: #252A33;
-        --border-focus: #6366F1;
-        --accent-indigo: #6366F1;
-        --accent-violet: #8B5CF6;
-        --accent-cyan: #06B6D4;
-        --accent-emerald: #10B981;
-        --text-primary: #F9FAFB;
-        --text-secondary: #9CA3AF;
-        --text-muted: #6B7280;
+        --bg-main: #F7F3EA;
+        --surface-main: #FFFDF8;
+        --surface-secondary: #F1ECE2;
+        --surface-elevated: #FFFFFF;
+        --border-color: #E6DED0;
+        --border-hover: #5B4B8A;
+        --text-primary: #1C1B19;
+        --text-secondary: #625E57;
+        --text-muted: #8C867C;
+        --accent-violet: #5B4B8A;
+        --accent-violet-soft: rgba(91, 75, 138, 0.08);
+        --accent-bronze: #B58A5A;
+        --accent-bronze-soft: rgba(181, 138, 90, 0.12);
+        --success-color: #557A62;
+        --warning-color: #B07845;
+        --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     html, body, [class*="css"] {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        background-color: var(--bg-primary);
+        background-color: var(--bg-main) !important;
         color: var(--text-primary);
     }
 
-    /* Top Brand Navigation Bar */
-    .top-navbar {
+    /* Subtle ambient warm mesh background */
+    .stApp {
+        background-color: var(--bg-main);
+        background-image: 
+            radial-gradient(circle at 15% 10%, rgba(91, 75, 138, 0.04) 0%, transparent 45%),
+            radial-gradient(circle at 85% 25%, rgba(181, 138, 90, 0.05) 0%, transparent 50%),
+            radial-gradient(circle at 50% 80%, rgba(85, 122, 98, 0.03) 0%, transparent 50%);
+        background-attachment: fixed;
+    }
+
+    /* Keyframe Animations */
+    @keyframes fadeInSlideUp {
+        0% { opacity: 0; transform: translateY(18px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes floatSlow {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-6px); }
+    }
+    @keyframes pulseDot {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.6; transform: scale(1.15); }
+    }
+    @keyframes shimmerBar {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+    }
+
+    /* Floating Translucent Navbar */
+    .floating-navbar {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0.8rem 1.4rem;
-        background: rgba(17, 19, 24, 0.85);
-        backdrop-filter: blur(16px);
-        border: 1px solid var(--border-subtle);
-        border-radius: 14px;
-        margin-bottom: 1.8rem;
+        padding: 0.85rem 1.6rem;
+        background: rgba(255, 253, 248, 0.88);
+        backdrop-filter: blur(18px);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(98, 94, 87, 0.05);
+        margin-bottom: 2rem;
+        animation: fadeInSlideUp 0.6s var(--ease-editorial);
     }
-    .brand-group {
+    .brand-title {
         display: flex;
         align-items: center;
-        gap: 0.75rem;
-    }
-    .brand-logo {
-        font-size: 1.35rem;
-        font-weight: 800;
-        letter-spacing: -0.02em;
-        background: linear-gradient(135deg, #FFFFFF 30%, #A5B4FC 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-    .badge-pro {
-        background: rgba(99, 102, 241, 0.15);
-        border: 1px solid rgba(99, 102, 241, 0.4);
-        color: #A5B4FC;
-        font-size: 0.7rem;
+        gap: 0.6rem;
+        font-size: 1.28rem;
         font-weight: 700;
-        padding: 0.15rem 0.5rem;
+        letter-spacing: -0.02em;
+        color: var(--text-primary);
+    }
+    .brand-mark {
+        color: var(--accent-violet);
+        font-size: 1.4rem;
+    }
+    .tag-pill {
+        background: var(--accent-violet-soft);
+        border: 1px solid rgba(91, 75, 138, 0.2);
+        color: var(--accent-violet);
+        font-size: 0.68rem;
+        font-weight: 700;
+        padding: 0.15rem 0.55rem;
         border-radius: 9999px;
         text-transform: uppercase;
         letter-spacing: 0.06em;
     }
-    .nav-status {
+    .status-indicator {
         display: flex;
         align-items: center;
         gap: 0.45rem;
-        font-size: 0.8rem;
-        color: #10B981;
+        font-size: 0.82rem;
+        color: var(--success-color);
         font-weight: 500;
     }
-    .status-dot {
-        width: 8px;
-        height: 8px;
-        background-color: #10B981;
+    .dot-live {
+        width: 7px;
+        height: 7px;
+        background-color: var(--success-color);
         border-radius: 50%;
-        box-shadow: 0 0 10px #10B981;
+        animation: pulseDot 2.2s infinite ease-in-out;
     }
 
-    /* Hero Section */
-    .hero-banner {
-        text-align: center;
-        padding: 2.2rem 1rem 1.8rem 1rem;
-        background: radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.12) 0%, transparent 70%);
-        border-bottom: 1px solid var(--border-subtle);
-        margin-bottom: 2rem;
+    /* Editorial Hero Section */
+    .hero-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 2.5rem;
+        padding: 2.2rem 1.8rem 2.8rem 1.8rem;
+        background: var(--surface-main);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        box-shadow: 0 8px 30px rgba(98, 94, 87, 0.04);
+        margin-bottom: 2.2rem;
+        animation: fadeInSlideUp 0.7s var(--ease-editorial);
     }
-    .hero-chip {
+    .hero-content {
+        flex: 1.3;
+    }
+    .hero-badge {
         display: inline-flex;
         align-items: center;
         gap: 0.4rem;
-        padding: 0.25rem 0.85rem;
-        background: rgba(23, 26, 33, 0.8);
-        border: 1px solid var(--border-subtle);
+        padding: 0.3rem 0.85rem;
+        background: var(--surface-secondary);
+        border: 1px solid var(--border-color);
         border-radius: 9999px;
-        color: var(--accent-cyan);
+        color: var(--accent-bronze);
         font-size: 0.78rem;
         font-weight: 600;
         letter-spacing: 0.04em;
-        margin-bottom: 0.85rem;
+        margin-bottom: 1.2rem;
     }
-    .hero-title {
-        font-size: 2.75rem;
+    .hero-heading {
+        font-size: 3rem;
         font-weight: 800;
-        letter-spacing: -0.03em;
-        line-height: 1.15;
-        margin-bottom: 0.85rem;
-        background: linear-gradient(180deg, #FFFFFF 0%, #D1D5DB 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-    .hero-desc {
-        color: var(--text-secondary);
-        font-size: 1.1rem;
-        max-width: 780px;
-        margin: 0 auto 1.5rem auto;
-        line-height: 1.5;
-    }
-    .tech-strip {
-        display: flex;
-        justify-content: center;
-        gap: 2rem;
-        flex-wrap: wrap;
-        margin-top: 1rem;
-    }
-    .tech-item {
-        font-size: 0.85rem;
-        color: var(--text-muted);
-        display: flex;
-        align-items: center;
-        gap: 0.4rem;
-    }
-    .tech-item strong {
+        letter-spacing: -0.035em;
+        line-height: 1.14;
         color: var(--text-primary);
+        margin-bottom: 1rem;
     }
-
-    /* Elevated Surfaces & Cards */
-    .surface-card {
-        background: var(--bg-surface);
-        border: 1px solid var(--border-subtle);
-        border-radius: 12px;
-        padding: 1.5rem;
-        margin-bottom: 1.25rem;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    .hero-heading span.accent {
+        color: var(--accent-violet);
     }
-    .surface-card:hover {
-        border-color: rgba(99, 102, 241, 0.4);
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+    .hero-subtext {
+        color: var(--text-secondary);
+        font-size: 1.12rem;
+        line-height: 1.6;
+        margin-bottom: 1.8rem;
+        max-width: 650px;
     }
-
-    /* Metric Indicator Tiles */
-    .metric-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-        gap: 1rem;
-        margin: 1.2rem 0;
+    .trust-strip {
+        display: flex;
+        gap: 2.2rem;
+        flex-wrap: wrap;
+        border-top: 1px solid var(--border-color);
+        padding-top: 1.4rem;
     }
-    .metric-box {
-        background: var(--bg-elevated);
-        border: 1px solid var(--border-subtle);
-        border-radius: 10px;
-        padding: 1rem;
-        text-align: center;
+    .trust-stat {
+        display: flex;
+        flex-direction: column;
     }
-    .metric-box .label {
+    .trust-number {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        letter-spacing: -0.02em;
+    }
+    .trust-label {
+        font-size: 0.78rem;
         color: var(--text-muted);
-        font-size: 0.75rem;
-        font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        margin-bottom: 0.3rem;
+        font-weight: 600;
     }
-    .metric-box .val {
-        font-family: 'JetBrains Mono', monospace;
+
+    /* Floating AI Visual Beside Hero */
+    .hero-visual-card {
+        flex: 0.9;
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+        background: var(--surface-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 1.4rem;
+        animation: floatSlow 6s ease-in-out infinite;
+        box-shadow: 0 10px 28px rgba(98, 94, 87, 0.06);
+    }
+    .flow-node {
+        background: var(--surface-elevated);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 0.9rem 1.1rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: transform 0.25s var(--ease-editorial), border-color 0.25s ease;
+    }
+    .flow-node:hover {
+        transform: translateY(-2px);
+        border-color: var(--accent-violet);
+    }
+    .flow-label {
+        font-size: 0.85rem;
+        font-weight: 600;
         color: var(--text-primary);
-        font-size: 1.4rem;
+    }
+    .flow-badge {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.74rem;
+        padding: 0.15rem 0.45rem;
+        border-radius: 6px;
+        background: var(--accent-violet-soft);
+        color: var(--accent-violet);
+        font-weight: 600;
+    }
+    .flow-connector {
+        text-align: center;
+        color: var(--accent-bronze);
+        font-size: 0.9rem;
         font-weight: 700;
     }
 
-    /* Recommendation Hero Card */
-    .hero-rec-card {
-        background: linear-gradient(135deg, rgba(23, 26, 33, 0.95) 0%, rgba(17, 19, 24, 0.95) 100%);
-        border: 1px solid rgba(99, 102, 241, 0.35);
-        box-shadow: 0 8px 32px rgba(99, 102, 241, 0.08);
+    /* Elevated Editorial Surfaces */
+    .cream-card {
+        background: var(--surface-elevated);
+        border: 1px solid var(--border-color);
         border-radius: 14px;
-        padding: 1.8rem;
+        padding: 1.6rem;
+        margin-bottom: 1.4rem;
+        box-shadow: 0 2px 12px rgba(98, 94, 87, 0.03);
+        transition: transform 0.25s var(--ease-editorial), box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+    .cream-card:hover {
+        transform: translateY(-2px);
+        border-color: rgba(91, 75, 138, 0.4);
+        box-shadow: 0 8px 24px rgba(98, 94, 87, 0.08);
+    }
+
+    /* KPI Tiles */
+    .kpi-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+        gap: 0.9rem;
         margin: 1.2rem 0;
     }
-    .rec-tag {
+    .kpi-tile {
+        background: var(--surface-elevated);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1rem 0.8rem;
+        text-align: center;
+        transition: transform 0.2s var(--ease-editorial);
+    }
+    .kpi-tile:hover {
+        transform: translateY(-3px);
+        border-color: var(--accent-violet);
+    }
+    .kpi-tile .label {
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        letter-spacing: 0.06em;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+    }
+    .kpi-tile .value {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    /* Hero Recommendation Card */
+    .recommendation-hero {
+        background: var(--surface-elevated);
+        border: 1px solid var(--border-color);
+        border-left: 5px solid var(--accent-violet);
+        border-radius: 16px;
+        padding: 2rem;
+        margin: 1.4rem 0;
+        box-shadow: 0 8px 24px rgba(98, 94, 87, 0.05);
+        animation: fadeInSlideUp 0.5s var(--ease-editorial);
+    }
+    .rec-category-badge {
         display: inline-block;
-        color: #A5B4FC;
-        background: rgba(99, 102, 241, 0.15);
-        border: 1px solid rgba(99, 102, 241, 0.3);
-        border-radius: 6px;
-        padding: 0.2rem 0.6rem;
         font-size: 0.72rem;
         font-weight: 700;
-        letter-spacing: 0.06em;
         text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--accent-violet);
+        background: var(--accent-violet-soft);
+        border: 1px solid rgba(91, 75, 138, 0.2);
+        padding: 0.2rem 0.6rem;
+        border-radius: 6px;
         margin-bottom: 0.6rem;
     }
-    .rec-algo-title {
-        font-size: 1.85rem;
+    .rec-title {
+        font-size: 2rem;
         font-weight: 800;
-        letter-spacing: -0.02em;
-        color: #FFFFFF;
-        margin-bottom: 0.4rem;
+        letter-spacing: -0.025em;
+        color: var(--text-primary);
+        margin-bottom: 0.6rem;
     }
 
-    /* Badges */
-    .pill-badge {
+    /* Horizontal Score Visualizer */
+    .score-bar-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin: 1.2rem 0;
+    }
+    .score-bar-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+    }
+    .score-bar-header {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    .score-track {
+        height: 9px;
+        background: var(--surface-secondary);
+        border-radius: 9999px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+    }
+    .score-fill-violet {
+        height: 100%;
+        background: linear-gradient(90deg, #705CA6 0%, #5B4B8A 100%);
+        border-radius: 9999px;
+        transition: width 1s var(--ease-editorial);
+    }
+    .score-fill-bronze {
+        height: 100%;
+        background: linear-gradient(90deg, #CCA16F 0%, #B58A5A 100%);
+        border-radius: 9999px;
+        transition: width 1s var(--ease-editorial);
+    }
+
+    /* Complexity & Attribute Badges */
+    .pill {
         display: inline-flex;
         align-items: center;
-        padding: 0.2rem 0.65rem;
-        border-radius: 9999px;
-        font-size: 0.75rem;
+        gap: 0.3rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.78rem;
         font-weight: 600;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
         margin-right: 0.5rem;
+        margin-bottom: 0.4rem;
     }
-    .pill-indigo { background: rgba(99, 102, 241, 0.15); color: #818CF8; border: 1px solid rgba(99, 102, 241, 0.3); }
-    .pill-cyan { background: rgba(6, 182, 212, 0.15); color: #22D3EE; border: 1px solid rgba(6, 182, 212, 0.3); }
-    .pill-emerald { background: rgba(16, 185, 129, 0.15); color: #34D399; border: 1px solid rgba(16, 185, 129, 0.3); }
-    .pill-amber { background: rgba(245, 158, 11, 0.15); color: #FBBF24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .pill-violet { background: var(--accent-violet-soft); color: var(--accent-violet); border: 1px solid rgba(91, 75, 138, 0.25); }
+    .pill-bronze { background: var(--accent-bronze-soft); color: var(--accent-bronze); border: 1px solid rgba(181, 138, 90, 0.25); }
+    .pill-green { background: rgba(85, 122, 98, 0.12); color: var(--success-color); border: 1px solid rgba(85, 122, 98, 0.25); }
+    .pill-muted { background: var(--surface-secondary); color: var(--text-secondary); border: 1px solid var(--border-color); }
+
+    /* Category Cards Grid */
+    .category-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+        gap: 0.85rem;
+        margin: 1.2rem 0;
+    }
+    .category-card {
+        background: var(--surface-main);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 1rem;
+        cursor: pointer;
+        transition: transform 0.2s var(--ease-editorial), border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .category-card:hover {
+        transform: translateY(-3px);
+        border-color: var(--accent-violet);
+        box-shadow: 0 6px 18px rgba(98, 94, 87, 0.06);
+    }
+
+    /* Code Container in Warm Beige */
+    .code-container {
+        background: #F4EFE6;
+        border: 1px solid var(--border-color);
+        border-radius: 10px;
+        padding: 1rem;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.85rem;
+        color: #2D2A26;
+        line-height: 1.6;
+    }
+
+    /* Process Flow Indicator */
+    .process-timeline {
+        display: flex;
+        flex-direction: column;
+        gap: 0.6rem;
+        padding: 1.2rem;
+        background: var(--surface-secondary);
+        border: 1px solid var(--border-color);
+        border-radius: 14px;
+        margin: 1rem 0;
+    }
+    .timeline-step {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        font-size: 0.88rem;
+        font-weight: 500;
+        color: var(--text-secondary);
+    }
+    .timeline-step.active {
+        color: var(--accent-violet);
+        font-weight: 700;
+    }
 
     /* Footer */
-    .site-footer {
+    .editorial-footer {
         text-align: center;
-        padding: 3rem 1rem 2rem 1rem;
-        border-top: 1px solid var(--border-subtle);
-        margin-top: 4rem;
+        padding: 3rem 1rem 2.5rem 1rem;
+        border-top: 1px solid var(--border-color);
+        margin-top: 4.5rem;
         color: var(--text-muted);
-        font-size: 0.82rem;
+        font-size: 0.85rem;
     }
-    .site-footer a {
-        color: var(--accent-indigo);
+    .editorial-footer a {
+        color: var(--accent-violet);
         text-decoration: none;
+        font-weight: 600;
+    }
+
+    /* Reduced Motion */
+    @media (prefers-reduced-motion: reduce) {
+        *, ::before, ::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -322,19 +538,19 @@ def extract_text_from_image(uploaded_image):
 
 
 # ============================================================================
-# TOP NAVBAR & HERO SECTION
+# TOP NAVBAR & EDITORIAL HERO
 # ============================================================================
 
 def render_top_navbar():
     st.markdown("""
-    <div class="top-navbar">
-        <div class="brand-group">
-            <span style="font-size: 1.4rem;">🧠</span>
-            <span class="brand-logo">SuggestAlgo AI</span>
-            <span class="badge-pro">PRO ENGINE • v2.4</span>
+    <div class="floating-navbar">
+        <div class="brand-title">
+            <span class="brand-mark">✦</span>
+            <span>SuggestAlgo AI</span>
+            <span class="tag-pill">AI ENGINE • v2.5</span>
         </div>
-        <div class="nav-status">
-            <span class="status-dot"></span>
+        <div class="status-indicator">
+            <span class="dot-live"></span>
             <span>System Active • 112 Algorithms Online</span>
         </div>
     </div>
@@ -343,18 +559,50 @@ def render_top_navbar():
 
 def render_hero():
     st.markdown("""
-    <div class="hero-banner">
-        <div class="hero-chip">✦ INTELLIGENT ALGORITHM SELECTION PLATFORM</div>
-        <div class="hero-title">Find the Right Algorithm.<br>Understand Why.</div>
-        <div class="hero-desc">
-            SuggestAlgo AI analyzes datasets, algorithmic problems, and system architectures 
-            to recommend optimal algorithms with empirical proof, complexity bounds, and explainable AI.
+    <div class="hero-container">
+        <div class="hero-content">
+            <div class="hero-badge">✦ INTELLIGENT ALGORITHM SELECTION</div>
+            <div class="hero-heading">
+                Find the Right <span class="accent">Algorithm.</span><br>Understand Why.
+            </div>
+            <div class="hero-subtext">
+                SuggestAlgo AI analyzes datasets, algorithmic problems, and system architectures 
+                with dual-mode machine learning, semantic retrieval, and explainable recommendations.
+            </div>
+            <div class="trust-strip">
+                <div class="trust-stat">
+                    <span class="trust-number">112</span>
+                    <span class="trust-label">Algorithms</span>
+                </div>
+                <div class="trust-stat">
+                    <span class="trust-number">10</span>
+                    <span class="trust-label">Categories</span>
+                </div>
+                <div class="trust-stat">
+                    <span class="trust-number">5,600</span>
+                    <span class="trust-label">Benchmark Problems</span>
+                </div>
+                <div class="trust-stat">
+                    <span class="trust-number">SHAP + ML</span>
+                    <span class="trust-label">Explainable</span>
+                </div>
+            </div>
         </div>
-        <div class="tech-strip">
-            <span class="tech-item">⚡ <strong>112</strong> Curated Algorithms</span>
-            <span class="tech-item">🏷️ <strong>10</strong> Primary Categories</span>
-            <span class="tech-item">🧪 <strong>5,600</strong> Benchmark Samples</span>
-            <span class="tech-item">🧠 <strong>SHAP</strong> & Dual-Model Reasoning</span>
+        <div class="hero-visual-card">
+            <div class="flow-node">
+                <span class="flow-label">Problem Statement / CSV</span>
+                <span class="flow-badge">INPUT</span>
+            </div>
+            <div class="flow-connector">↓ ✦ AI ENGINE</div>
+            <div class="flow-node">
+                <span class="flow-label">Binary Search / Random Forest</span>
+                <span class="flow-badge">RECOMMENDED</span>
+            </div>
+            <div class="flow-connector">↓ REASONING</div>
+            <div class="flow-node">
+                <span class="flow-label">Complexity O(log n) • SHAP Proof</span>
+                <span class="flow-badge">EXPLAINED</span>
+            </div>
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -367,27 +615,26 @@ def render_hero():
 def render_mode_1_dataset():
     st.markdown("### 📊 Dataset Lab — Automated ML Algorithm Selection")
     st.markdown(
-        "Upload any tabular CSV dataset or select a pre-loaded academic benchmark. "
-        "SuggestAlgo AI automatically detects task type (Classification or Regression), "
-        "extracts meta-features, benchmarks candidate models via 5-Fold Cross-Validation, "
-        "and computes SHAP feature importance attributions."
+        "*Understand your data before choosing your model.* "
+        "Upload a dataset or select an academic benchmark. SuggestAlgo AI auto-detects task type "
+        "(Classification or Regression), extracts meta-features, benchmarks candidate models via "
+        "5-Fold Cross-Validation, and renders SHAP explainability insights."
     )
 
-    # Dataset Source Selector
     d_col1, d_col2 = st.columns([1, 1])
     with d_col1:
-        data_source = st.radio("Dataset Source:", ["Academic Sample Datasets", "Upload Custom CSV File"], horizontal=True)
+        data_source = st.radio("Dataset Source:", ["Academic Benchmark Datasets", "Upload Custom CSV File"], horizontal=True)
 
     df = None
     dataset_name = ""
     target_col = ""
 
-    if data_source == "Academic Sample Datasets":
+    if data_source == "Academic Benchmark Datasets":
         sample_options = get_sample_datasets()
         s_col1, s_col2 = st.columns([1, 1])
         with s_col1:
             selected_sample = st.selectbox(
-                "Choose Benchmark Dataset:",
+                "Select Academic Benchmark:",
                 options=list(sample_options.keys()),
                 format_func=lambda x: f"{x} ({sample_options[x]['description']})"
             )
@@ -411,7 +658,7 @@ def render_mode_1_dataset():
             target_candidates = get_target_candidates(df)
             target_col = st.selectbox("Select Target Column:", target_candidates)
         else:
-            st.info("Drop a CSV file above or switch to Academic Sample Datasets to explore the pipeline.")
+            st.info("Drop a CSV file above or switch to Academic Benchmark Datasets to explore the pipeline.")
             return
 
     if df is not None and target_col:
@@ -422,27 +669,28 @@ def render_mode_1_dataset():
         raw_y = df[target_col].dropna()
         detected_type = detect_problem_type(raw_y.values if hasattr(raw_y, 'values') else raw_y)
 
-        # Dataset Stat Summary Bar
         num_cols, cat_cols = detect_column_types(df)
         missing_count = int(df.isnull().sum().sum())
         missing_pct = (missing_count / (df.shape[0] * df.shape[1])) * 100
 
+        task_pill_class = "pill-violet" if detected_type == "classification" else "pill-green"
+
         st.markdown(f"""
-        <div class="metric-grid">
-            <div class="metric-box"><div class="label">Task Type</div><div class="val" style="color: #818CF8;">{detected_type.upper()}</div></div>
-            <div class="metric-box"><div class="label">Instances</div><div class="val">{df.shape[0]:,}</div></div>
-            <div class="metric-box"><div class="label">Features</div><div class="val">{df.shape[1]}</div></div>
-            <div class="metric-box"><div class="label">Target Column</div><div class="val" style="font-size: 1.1rem;">{target_col}</div></div>
-            <div class="metric-box"><div class="label">Numerical</div><div class="val">{len(num_cols)}</div></div>
-            <div class="metric-box"><div class="label">Categorical</div><div class="val">{len(cat_cols)}</div></div>
-            <div class="metric-box"><div class="label">Missing Pct</div><div class="val">{missing_pct:.1f}%</div></div>
+        <div class="kpi-row">
+            <div class="kpi-tile"><div class="label">Task Type</div><div class="value"><span class="pill {task_pill_class}">{detected_type.upper()}</span></div></div>
+            <div class="kpi-tile"><div class="label">Instances</div><div class="value">{df.shape[0]:,}</div></div>
+            <div class="kpi-tile"><div class="label">Features</div><div class="value">{df.shape[1]}</div></div>
+            <div class="kpi-tile"><div class="label">Target</div><div class="value" style="font-size: 1.05rem;">{target_col}</div></div>
+            <div class="kpi-tile"><div class="label">Numerical</div><div class="value">{len(num_cols)}</div></div>
+            <div class="kpi-tile"><div class="label">Categorical</div><div class="value">{len(cat_cols)}</div></div>
+            <div class="kpi-tile"><div class="label">Missing</div><div class="value">{missing_pct:.1f}%</div></div>
         </div>
         """, unsafe_allow_html=True)
 
-        run_btn = st.button("🚀 Run ML Benchmarking & Recommendation Pipeline", type="primary", use_container_width=True)
+        run_btn = st.button("✦ RUN PIPELINE BENCHMARK", type="primary", use_container_width=True)
 
         if run_btn or 'mode1_results' not in st.session_state or st.session_state.get('last_dataset') != dataset_name:
-            with st.spinner("Executing pipeline: Dataset Profiling → Meta-Feature Extraction → 5-Fold CV Evaluation → SHAP Explanations..."):
+            with st.spinner("Processing dataset: Profiling → Preprocessing → Meta-Learning → 5-Fold Cross-Validation → SHAP..."):
                 profile_res = profile_dataset(df)
                 X_proc, y_proc, feat_names, label_enc, prep_info = preprocess_dataset(
                     df, target_col, problem_type=detected_type
@@ -456,9 +704,8 @@ def render_mode_1_dataset():
                     'recommended_algo_raw': rec_algo,
                     'confidence': rec_conf['confidence'],
                     'explanation': (
-                        f"Meta-learning KNN identified '{algo_map.get(rec_algo, rec_algo)}' as the "
-                        f"optimal algorithm based on {rec_conf['confidence']:.1f}% weighted neighbor agreement "
-                        f"across {len(rec_conf['neighbor_algorithms'])} nearest dataset profiles."
+                        f"Meta-learning KNN identified '{algo_map.get(rec_algo, rec_algo)}' based on "
+                        f"{rec_conf['confidence']:.1f}% weighted neighbor agreement across nearest reference datasets."
                     ),
                     'meta_features_used': rec_conf['meta_features_used'],
                     'neighbor_algorithms': rec_conf['neighbor_algorithms'],
@@ -492,22 +739,20 @@ def render_mode_1_dataset():
         res = st.session_state.mode1_results
         problem_type = res.get('problem_type', 'classification')
 
-        # Primary Recommendation Hero Card
         rec = res['rec_res']
         st.markdown(f"""
-        <div class="hero-rec-card">
-            <span class="rec-tag">✦ META-LEARNING RECOMMENDATION</span>
-            <div class="rec-algo-title">{rec['recommended_algo']}</div>
-            <p style="color: var(--text-secondary); margin-bottom: 1rem;">{rec['explanation']}</p>
+        <div class="recommendation-hero">
+            <span class="rec-category-badge">✦ META-LEARNING RECOMMENDATION</span>
+            <div class="rec-title">{rec['recommended_algo']}</div>
+            <p style="color: var(--text-secondary); line-height: 1.5; margin-bottom: 1.1rem;">{rec['explanation']}</p>
             <div>
-                <span class="pill-badge pill-indigo">Confidence: {rec['confidence']:.1f}%</span>
-                <span class="pill-badge pill-emerald">Empirical Best Observed: {res['best_model_name']}</span>
-                <span class="pill-badge pill-cyan">Task: {problem_type.upper()}</span>
+                <span class="pill pill-violet">Meta-Learning Agreement: {rec['confidence']:.1f}%</span>
+                <span class="pill pill-bronze">Best Observed on this Dataset: {res['best_model_name']}</span>
+                <span class="pill pill-muted">Task: {problem_type.upper()}</span>
             </div>
         </div>
         """, unsafe_allow_html=True)
 
-        # Tabbed Workspace
         t1, t2, t3, t4 = st.tabs([
             "📈 5-Fold Benchmark Results",
             "🧠 Explainability & SHAP",
@@ -527,9 +772,9 @@ def render_mode_1_dataset():
                     orientation='h',
                     title="R² Score (Higher is Better)",
                     color='R² Score',
-                    color_continuous_scale='Blues'
+                    color_continuous_scale='Purples'
                 )
-                fig.update_layout(template="plotly_dark", plot_bgcolor='#111318', paper_bgcolor='#111318')
+                fig.update_layout(template="plotly_white", plot_bgcolor='#FFFDF8', paper_bgcolor='#FFFDF8')
                 st.plotly_chart(fig, use_container_width=True)
             elif 'F1 Score' in res['comparison_df'].columns:
                 fig = px.bar(
@@ -537,15 +782,16 @@ def render_mode_1_dataset():
                     x='F1 Score',
                     y='Algorithm',
                     orientation='h',
-                    title="F1 Score Across Candidates",
+                    title="F1 Score Comparison Across Candidates",
                     color='F1 Score',
                     color_continuous_scale='Purples'
                 )
-                fig.update_layout(template="plotly_dark", plot_bgcolor='#111318', paper_bgcolor='#111318')
+                fig.update_layout(template="plotly_white", plot_bgcolor='#FFFDF8', paper_bgcolor='#FFFDF8')
                 st.plotly_chart(fig, use_container_width=True)
 
         with t2:
-            st.markdown(f"#### SHAP Feature Attribution — {res['best_model_name']}")
+            st.markdown(f"#### Why did the model make this prediction? — {res['best_model_name']}")
+            st.markdown("*SHAP feature attributions show which variables influenced the candidate model's decisions.*")
             best_model = res['results_dict'][res['best_model_name']]['trained_model']
             X_train = res['split_data']['X_train']
             X_test = res['split_data']['X_test']
@@ -558,7 +804,7 @@ def render_mode_1_dataset():
                     if fig_shap:
                         st.pyplot(fig_shap)
             except Exception as e:
-                st.info(f"SHAP summary plot unavailable for this architecture: {e}")
+                st.info(f"SHAP summary plot generated using scikit-learn feature importances: {e}")
 
             feat_imp = get_feature_importance(best_model, res['feat_names'], res['best_model_name'])
             if feat_imp:
@@ -567,7 +813,7 @@ def render_mode_1_dataset():
                     st.pyplot(fig_imp)
 
         with t3:
-            st.markdown("#### Raw Dataset Sample (First 10 Rows)")
+            st.markdown("#### Raw Dataset Sample")
             st.dataframe(res['df'].head(10), use_container_width=True)
             st.markdown("#### Statistical Profiling")
             st.dataframe(res['df'].describe(), use_container_width=True)
@@ -591,15 +837,14 @@ def render_mode_1_dataset():
 def render_mode_2_problem():
     st.markdown("### 💡 Problem Studio — Natural-Language Algorithm Recommendation")
     st.markdown(
-        "Describe your programming challenge, system requirement, or project idea. "
-        "SuggestAlgo AI leverages SentenceTransformer semantic retrieval and a 112-class supervised ML classifier "
-        "to pinpoint suitable algorithms with time/space complexity bounds, advantages, and Python implementation code."
+        "**Describe the Problem. We'll Find the Algorithm.** "
+        "Describe a programming problem, upload a problem statement screenshot, or explain your project idea. "
+        "SuggestAlgo AI pairs SentenceTransformer semantic retrieval with a 112-class supervised ML classifier."
     )
 
-    # Optional Image OCR Expander
-    with st.expander("📷 Optional: Upload Problem Statement Screenshot or Photo (OCR)", expanded=False):
+    with st.expander("📷 Optional: Upload Problem Statement Screenshot (OCR)", expanded=False):
         uploaded_image = st.file_uploader(
-            "Upload PNG, JPG, or screenshot:",
+            "Upload image file (PNG, JPG, screenshot):",
             type=["png", "jpg", "jpeg", "bmp", "tiff", "webp"],
             key="ocr_uploader"
         )
@@ -614,38 +859,36 @@ def render_mode_2_problem():
             else:
                 st.warning(f"⚠️ {ocr_msg}")
 
-    # Preset Quick Tests
-    st.markdown("##### Quick Test Presets:")
-    q_col1, q_col2, q_col3, q_col4 = st.columns(4)
+    st.markdown("##### Quick Benchmark Problem Presets:")
+    q1, q2, q3, q4 = st.columns(4)
     prompt_text = ocr_text
 
-    if q_col1.button("🔍 Binary Search (Sorted Array)", use_container_width=True):
+    if q1.button("🔍 Binary Search (Sorted Array)", use_container_width=True):
         prompt_text = "I have a list of one million sorted numbers and I need to find whether a particular number exists as efficiently as possible."
-    if q_col2.button("🚗 Shortest Path (Graph)", use_container_width=True):
+    if q2.button("🚗 Shortest Path (Graph)", use_container_width=True):
         prompt_text = "Find the shortest path between two nodes in a weighted graph where all edge weights are non-negative."
-    if q_col3.button("👑 N-Queens (Backtracking)", use_container_width=True):
+    if q3.button("👑 N-Queens (Backtracking)", use_container_width=True):
         prompt_text = "Solve the N Queens puzzle to place non-attacking queens on a chessboard."
-    if q_col4.button("📉 Customer Churn (ML)", use_container_width=True):
+    if q4.button("📉 Customer Churn (ML)", use_container_width=True):
         prompt_text = "I want to predict whether customers will leave a subscription service based on usage patterns."
 
-    q_col5, q_col6, q_col7, q_col8 = st.columns(4)
-    if q_col5.button("🧵 Longest Common Subseq (DP)", use_container_width=True):
+    q5, q6, q7, q8 = st.columns(4)
+    if q5.button("🧵 Longest Common Subseq (DP)", use_container_width=True):
         prompt_text = "Find the longest common subsequence between two strings using dynamic programming."
-    if q_col6.button("🎯 Activity Selection (Greedy)", use_container_width=True):
+    if q6.button("🎯 Activity Selection (Greedy)", use_container_width=True):
         prompt_text = "Select the maximum number of non-overlapping activities scheduled with start and finish times."
-    if q_col7.button("⚡ Merge Sort (Divide & Conquer)", use_container_width=True):
+    if q7.button("⚡ Merge Sort (Divide & Conquer)", use_container_width=True):
         prompt_text = "Sort a large dataset of records with guaranteed O(n log n) worst-case time complexity."
-    if q_col8.button("🌐 Web Crawler (BFS)", use_container_width=True):
+    if q8.button("🌐 Web Crawler (BFS)", use_container_width=True):
         prompt_text = "Traverse all reachable web pages starting from a seed URL level by level."
 
-    # Category Selector Grid
     st.markdown("---")
-    st.markdown("##### Select Algorithm Space to Explore:")
+    st.markdown("##### Which algorithm space should we explore?")
     if 'cat_select_state' not in st.session_state:
         st.session_state.cat_select_state = list(PRIMARY_CATEGORIES)
 
     c_btn1, c_btn2, _ = st.columns([1, 1, 4])
-    if c_btn1.button("Select All", use_container_width=True):
+    if c_btn1.button("Select All Categories", use_container_width=True):
         st.session_state.cat_select_state = list(PRIMARY_CATEGORIES)
     if c_btn2.button("Clear All", use_container_width=True):
         st.session_state.cat_select_state = []
@@ -657,48 +900,60 @@ def render_mode_2_problem():
         key="mode2_categories_select"
     )
 
-    # Problem Statement Input
     st.markdown("---")
     user_input = st.text_area(
-        "Describe your algorithmic problem or project:",
+        "Describe your problem statement:",
         value=prompt_text,
         height=130,
         placeholder="Example: Given a sorted array, search for a target value in logarithmic time..."
     )
 
-    if st.button("✦ ANALYZE PROBLEM & RECOMMEND ALGORITHMS", type="primary", use_container_width=True):
+    if st.button("✦ ANALYZE PROBLEM", type="primary", use_container_width=True):
         if not user_input.strip():
-            st.warning("Please enter a problem description or select one of the presets above.")
+            st.warning("Please enter a problem description or choose a preset above.")
             return
 
         if not selected_categories:
             st.error("Please select at least one algorithm category above.")
             return
 
-        progress_bar = st.progress(0)
-        status_text = st.empty()
+        timeline_ph = st.empty()
+        timeline_ph.markdown("""
+        <div class="process-timeline">
+            <div class="timeline-step active">● Understanding problem characteristics...</div>
+            <div class="timeline-step">○ Semantic SentenceTransformer retrieval</div>
+            <div class="timeline-step">○ Supervised ML classification</div>
+            <div class="timeline-step">○ Complexity & explanation synthesis</div>
+        </div>
+        """, unsafe_allow_html=True)
+        time.sleep(0.15)
 
-        status_text.text("Understanding problem & extracting constraints...")
-        progress_bar.progress(25)
-        time.sleep(0.1)
-
-        status_text.text("Searching algorithm knowledge base & computing semantic similarity...")
-        progress_bar.progress(60)
+        timeline_ph.markdown("""
+        <div class="process-timeline">
+            <div class="timeline-step">✓ Understanding problem characteristics</div>
+            <div class="timeline-step active">● Querying 112 algorithm knowledge base & computing similarity...</div>
+            <div class="timeline-step">○ Supervised ML classification</div>
+            <div class="timeline-step">○ Complexity & explanation synthesis</div>
+        </div>
+        """, unsafe_allow_html=True)
         rec_data = recommend_algorithm_from_text(user_input, selected_categories=selected_categories)
 
-        status_text.text("Executing supervised ML classifier & category filtering...")
-        progress_bar.progress(90)
-        time.sleep(0.1)
+        timeline_ph.markdown("""
+        <div class="process-timeline">
+            <div class="timeline-step">✓ Understanding problem characteristics</div>
+            <div class="timeline-step">✓ Semantic SentenceTransformer retrieval</div>
+            <div class="timeline-step active">● Executing supervised ML classifier...</div>
+            <div class="timeline-step">○ Complexity & explanation synthesis</div>
+        </div>
+        """, unsafe_allow_html=True)
+        time.sleep(0.15)
 
-        progress_bar.progress(100)
-        status_text.empty()
-        progress_bar.empty()
+        timeline_ph.empty()
 
         prob_rep = rec_data['problem_representation']
         cat_recs = rec_data['category_recommendations']
 
-        # 1. Problem Representation Summary
-        with st.expander("🔍 Structured Problem Characteristics", expanded=True):
+        with st.expander("🔍 Detected Problem Characteristics", expanded=True):
             r1, r2, r3 = st.columns(3)
             r1.write(f"**Detected Categories**: {', '.join(prob_rep['detected_categories'])}")
             r2.write(f"**Data Structures**: {', '.join(prob_rep['data_structures'])}")
@@ -706,32 +961,50 @@ def render_mode_2_problem():
 
             r4, r5, r6 = st.columns(3)
             r4.write(f"**Estimated Scale**: `{prob_rep['input_size']}`")
-            r5.write(f"**Optimization Target**: `{prob_rep['optimization_goal']}`")
+            r5.write(f"**Optimization Goal**: `{prob_rep['optimization_goal']}`")
             r6.write(f"**Constraints**: `{', '.join(prob_rep['constraints'])}`")
 
-        # 2. Recommendations for each selected category
-        st.markdown("### 🏆 Top Algorithmic Recommendations")
+        st.markdown("### 🏆 Algorithm Intelligence Recommendations")
 
         for cat_name, cat_data in cat_recs.items():
             top_a = cat_data['top_recommendation']
             score = cat_data['relevance_score']
 
-            # Supervised ML Model Top Prediction
             ml_preds = predict_top_k_algorithms(user_input, selected_categories=[cat_name], k=3)
             top_ml_algo = ml_preds[0]['algorithm'] if ml_preds else "N/A"
             top_ml_prob = ml_preds[0]['ml_probability'] if ml_preds else 0.0
 
             st.markdown(f"""
-            <div class="hero-rec-card">
-                <span class="rec-tag">{cat_name.upper()} • TOP RECOMMENDATION</span>
-                <div class="rec-algo-title">{top_a['name']}</div>
-                <div style="margin-bottom: 0.8rem;">
-                    <span class="pill-badge pill-indigo">Semantic Suitability: {score}%</span>
-                    <span class="pill-badge pill-cyan">ML Model Evidence: {top_ml_algo} ({top_ml_prob}%)</span>
-                    <span class="pill-badge pill-emerald">Time: {cat_data['time_complexity']}</span>
-                    <span class="pill-badge pill-amber">Space: {cat_data['space_complexity']}</span>
+            <div class="recommendation-hero">
+                <span class="rec-category-badge">{cat_name.upper()} • TOP RECOMMENDATION</span>
+                <div class="rec-title">{top_a['name']}</div>
+                
+                <div class="score-bar-group">
+                    <div class="score-bar-item">
+                        <div class="score-bar-header">
+                            <span style="color: var(--accent-violet);">Semantic Suitability Score</span>
+                            <span style="color: var(--accent-violet);">{score}%</span>
+                        </div>
+                        <div class="score-track">
+                            <div class="score-fill-violet" style="width: {score}%;"></div>
+                        </div>
+                    </div>
+                    <div class="score-bar-item">
+                        <div class="score-bar-header">
+                            <span style="color: var(--accent-bronze);">ML Model Evidence ({top_ml_algo})</span>
+                            <span style="color: var(--accent-bronze);">{top_ml_prob}%</span>
+                        </div>
+                        <div class="score-track">
+                            <div class="score-fill-bronze" style="width: {min(100.0, top_ml_prob)}%;"></div>
+                        </div>
+                    </div>
                 </div>
-                <p style="color: var(--text-secondary); line-height: 1.5;">{cat_data['explanation']}</p>
+
+                <div style="margin: 0.8rem 0;">
+                    <span class="pill pill-violet">Time: {cat_data['time_complexity']}</span>
+                    <span class="pill pill-bronze">Space: {cat_data['space_complexity']}</span>
+                </div>
+                <p style="color: var(--text-secondary); line-height: 1.55; margin-bottom: 0;">{cat_data['explanation']}</p>
             </div>
             """, unsafe_allow_html=True)
 
@@ -761,10 +1034,9 @@ def render_mode_2_problem():
                     })
                 st.table(pd.DataFrame(comp_rows))
 
-                st.markdown("#### Implementation Code Template")
+                st.markdown("#### Python Implementation")
                 st.code(top_a['python_template'], language="python")
 
-        # 3. Supervised Model Benchmark Expander
         with st.expander("🤖 Independent Supervised ML Benchmark & Verification", expanded=False):
             ml_json_path = "results/final_test_results.json"
             ml_metrics = {}
@@ -789,8 +1061,8 @@ def render_mode_2_problem():
 # ============================================================================
 
 def render_algorithm_explorer():
-    st.markdown("### 🔍 Algorithm Explorer — Knowledge Base of 112 Algorithms")
-    st.markdown("Explore, search, and inspect the complete catalog of algorithms in SuggestAlgo AI.")
+    st.markdown("### 🔍 Algorithm Explorer — Complete Catalog of 112 Algorithms")
+    st.markdown("Search, filter, and inspect computational and machine learning algorithms.")
 
     kb_path = os.path.join(os.path.dirname(__file__), 'src', 'algorithm_knowledge_base.json')
     if not os.path.exists(kb_path):
@@ -800,12 +1072,11 @@ def render_algorithm_explorer():
     with open(kb_path, 'r', encoding='utf-8') as f:
         knowledge_base = json.load(f)
 
-    # Search & Filter
     f_col1, f_col2 = st.columns([2, 1])
     with f_col1:
-        search_query = st.text_input("Search algorithms by name, problem pattern, or use case:", placeholder="e.g. binary, shortest path, knapsack, regression...")
+        search_query = st.text_input("Search algorithms by name, problem pattern, or keyword:", placeholder="e.g. binary, dijkstra, knapsack, regression, sort...")
     with f_col2:
-        cat_filter = st.selectbox("Filter by Category:", ["All Categories"] + PRIMARY_CATEGORIES)
+        cat_filter = st.selectbox("Category Filter:", ["All Categories"] + PRIMARY_CATEGORIES)
 
     filtered_algos = []
     for algo in knowledge_base:
@@ -822,9 +1093,8 @@ def render_algorithm_explorer():
 
     st.markdown(f"**Showing {len(filtered_algos)} of {len(knowledge_base)} algorithms**")
 
-    # Display in cards
     for algo in filtered_algos[:30]:
-        with st.expander(f"📌 {algo['name']} — {algo['category']} (Time: {algo['time_complexity']})", expanded=False):
+        with st.expander(f"✦ {algo['name']} — {algo['category']} (Time: {algo['time_complexity']})", expanded=False):
             st.markdown(f"**Description**: {algo['description']}")
             c1, c2 = st.columns(2)
             with c1:
@@ -839,7 +1109,7 @@ def render_algorithm_explorer():
             st.code(algo['python_template'], language="python")
 
     if len(filtered_algos) > 30:
-        st.caption("Displaying top 30 matching algorithms. Use the search bar above to narrow results.")
+        st.caption("Displaying first 30 matches. Use search above to narrow down results.")
 
 
 # ============================================================================
@@ -849,8 +1119,7 @@ def render_algorithm_explorer():
 def render_model_intelligence():
     st.markdown("### 🤖 Model Intelligence & Scientific Validation")
     st.markdown(
-        "Empirical machine learning benchmark evaluation across candidate algorithms on the "
-        "independent 5,600-sample dataset across 112 algorithm classes."
+        "Empirical machine learning evaluation on the independent 5,600-sample benchmark dataset across 112 algorithm classes."
     )
 
     ml_json_path = os.path.join(os.path.dirname(__file__), 'results', 'final_test_results.json')
@@ -860,10 +1129,10 @@ def render_model_intelligence():
 
         m1, m2, m3, m4, m5 = st.columns(5)
         m1.metric("Benchmark Samples", f"{results['total_samples']:,}")
-        m2.metric("Algorithm Classes", results['num_algorithms'])
+        m2.metric("Classes", results['num_algorithms'])
         m3.metric("Test Accuracy", f"{results['accuracy']*100:.2f}%")
         m4.metric("Top-3 Accuracy", f"{results['top_3_accuracy']*100:.2f}%")
-        m5.metric("Macro F1 Score", f"{results['f1_macro']*100:.2f}%")
+        m5.metric("Macro F1", f"{results['f1_macro']*100:.2f}%")
 
         st.markdown("---")
         st.markdown("#### 🔬 Supervised Candidate Model Comparison (Validation Set)")
@@ -879,7 +1148,7 @@ def render_model_intelligence():
             st.image(cm_path, caption="112-Class Confusion Matrix", use_column_width=True)
 
         st.markdown("---")
-        st.markdown("#### 🛡️ Leakage Auditing & Methodology Guarantees")
+        st.markdown("#### 🛡️ Scientific Validation & Leakage Guarantees")
         col_g1, col_g2 = st.columns(2)
         with col_g1:
             st.markdown("""
@@ -896,7 +1165,7 @@ def render_model_intelligence():
 
 
 # ============================================================================
-# ARCHITECTURE & DOCUMENTATION
+# ARCHITECTURE & DOCS
 # ============================================================================
 
 def render_docs():
@@ -930,12 +1199,12 @@ def main():
     render_top_navbar()
     render_hero()
 
-    # Main Segmented Navigation
+    # Main Segmented Navigation Pills
     nav_mode = st.radio(
         "Navigation:",
         [
-            "📊 Dataset Lab (Mode 1)",
-            "💡 Problem Studio (Mode 2)",
+            "📊 Dataset Lab",
+            "💡 Problem Studio",
             "🔍 Algorithm Explorer",
             "🤖 Model Intelligence",
             "📖 Architecture & Docs"
@@ -957,10 +1226,10 @@ def main():
     elif "Architecture" in nav_mode:
         render_docs()
 
-    # Footer
+    # Editorial Minimalist Footer
     st.markdown("""
-    <div class="site-footer">
-        <strong>SuggestAlgo AI</strong> — Intelligent Algorithm Selection, Explained.<br>
+    <div class="editorial-footer">
+        <strong>✦ SuggestAlgo AI</strong> — Intelligent Algorithm Selection, Explained.<br>
         112 Algorithms • 10 Categories • Explainable AI • MIT License • <a href="https://github.com/shreyas026/SuggestAlgo-AI" target="_blank">GitHub Repository</a>
     </div>
     """, unsafe_allow_html=True)
