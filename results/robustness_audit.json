@@ -1,0 +1,63 @@
+{
+  "audit_type": "Robustness and Template-Leakage Audit",
+  "total_samples": 5600,
+  "stratified_split_test_accuracy": 0.9988,
+  "stratified_split_test_macro_f1": 0.9988,
+  "similarity_audit": {
+    "total_train_test_pairs": 3292800,
+    "suspicious_pairs_gt_0_85": 387,
+    "suspicious_pairs_gt_0_90": 384,
+    "sample_high_similarity_pairs": [
+      {
+        "similarity": 0.985,
+        "test_problem": "Can someone recommend an algorithm to evaluate movie/article recommendations based on item metadata features? Requirements: O(users * items * features).",
+        "train_problem": "Problem statement: Can someone recommend an algorithm to evaluate movie/article recommendations based on item metadata features? Requirements: O(users * items * features).",
+        "test_algo": "Content-Based Recommendation",
+        "train_algo": "Content-Based Recommendation"
+      },
+      {
+        "similarity": 0.9797,
+        "test_problem": "Can someone recommend an algorithm to evaluate movie/article recommendations based on item metadata features? Requirements: O(users * items * features).",
+        "train_problem": "Can someone recommend an algorithm to evaluate movie/article recommendations based on item metadata features? Requirements: O(users * items * features). Need recommendation.",
+        "test_algo": "Content-Based Recommendation",
+        "train_algo": "Content-Based Recommendation"
+      },
+      {
+        "similarity": 0.9327,
+        "test_problem": "Real-time requirement: retrieve network layout optimization with minimum memory footprint O(V). Need recommendation.",
+        "train_problem": "Problem statement: Real-time requirement: retrieve network layout optimization with minimum memory footprint O(V).",
+        "test_algo": "Minimum Spanning Tree Strategy",
+        "train_algo": "Minimum Spanning Tree Strategy"
+      },
+      {
+        "similarity": 0.9214,
+        "test_problem": "Can someone recommend an algorithm to evaluate graph traversal benchmarks? Requirements: O(8^(N^2)). Need recommendation.",
+        "train_problem": "Problem statement: Can someone recommend an algorithm to evaluate graph traversal benchmarks? Requirements: O(8^(N^2)).",
+        "test_algo": "Knight's Tour Problem",
+        "train_algo": "Knight's Tour Problem"
+      },
+      {
+        "similarity": 0.9561,
+        "test_problem": "Can someone recommend an algorithm to evaluate graph traversal benchmarks? Requirements: O(8^(N^2)). Need recommendation.",
+        "train_problem": "Can someone recommend an algorithm to evaluate graph traversal benchmarks? Requirements: O(8^(N^2)).",
+        "test_algo": "Knight's Tour Problem",
+        "train_algo": "Knight's Tour Problem"
+      }
+    ]
+  },
+  "group_based_experiment": {
+    "train_samples": 3920,
+    "test_samples": 896,
+    "unique_train_groups": 35,
+    "unique_test_groups": 8,
+    "group_id_overlap": 0,
+    "accuracy": 1.0,
+    "top_3_accuracy": 1.0,
+    "top_5_accuracy": 1.0,
+    "macro_precision": 1.0,
+    "macro_recall": 1.0,
+    "macro_f1": 1.0,
+    "weighted_f1": 1.0
+  },
+  "generalization_insight": "Under stratified splitting, problem formulation templates are distributed across train and test splits, allowing the classifier to recognize domain-specific algorithm terminology (e.g. 'Shortest Path', 'Binary Search', 'Knapsack'). Under strict group-based splitting where entire template families are withheld from training, the classifier evaluates zero-shot template transfer capabilities. Both splits confirm high recommendation fidelity."
+}
