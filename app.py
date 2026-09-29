@@ -41,7 +41,10 @@ from src.explainability import (
     explain_algorithm_selection
 )
 from src.utils import get_sample_datasets, load_sample_dataset, get_model_description
-from src.nlp_recommendation import recommend_algorithm_from_text
+from src.nlp_recommendation import PRIMARY_CATEGORIES, recommend_algorithm_from_text, analyze_natural_language_problem
+from src.mode2_ml_model import predict_top_k_algorithms, load_mode2_model
+
+
 
 # ============================================================================
 # PAGE CONFIGURATION
@@ -131,8 +134,9 @@ st.markdown("""
 
 def extract_text_from_image(uploaded_image):
     """
-    Try to extract text from an uploaded image using pytesseract (OCR).
-    Falls back to a descriptive placeholder if pytesseract is not installed.
+    Try to extract text from an uploaded image using PIL & pytesseract (OCR).
+    Handles missing pytesseract library or missing Tesseract binary executable gracefully.
+    Returns (text, success, status_message).
     """
     try:
         from PIL import Image
@@ -140,13 +144,16 @@ def extract_text_from_image(uploaded_image):
         img = Image.open(uploaded_image)
         text = pytesseract.image_to_string(img).strip()
         if text:
-            return text, True
-        return "", False
+            return text, True, "Text successfully extracted from image via OCR."
+        return "", False, "No readable text found in image."
     except ImportError:
-        # pytesseract not installed — return placeholder
-        return "", False
-    except Exception:
-        return "", False
+        return "", False, "Python package `pytesseract` is not installed."
+    except Exception as e:
+        err_msg = str(e)
+        if "tesseract is not installed" in err_msg.lower() or "not found" in err_msg.lower():
+            return "", False, "Tesseract OCR binary executable is not installed or not in system PATH."
+        return "", False, f"OCR Error: {err_msg}"
+
 
 
 # ============================================================================
@@ -501,13 +508,12 @@ def render_mode_1_dataset():
 # ============================================================================
 
 def render_mode_2_problem():
-    st.subheader("💡 Mode 2: Problem / Question / Project Idea Algorithm Recommendation")
+    st.subheader("💡 Mode 2: Category-Aware Natural-Language Algorithm Recommendation")
     st.markdown(
         "*Describe your coding problem, algorithmic query, or AI project idea in natural language "
         "— or upload an image/photo of a handwritten or printed problem statement. "
-        "SuggestAlgo AI will analyze requirements using semantic embeddings, map them against a "
-        "rich algorithm knowledge base, and provide structured recommendations, complexity analysis, "
-        "and Python templates.*"
+        "Select target algorithm categories to receive category-specific best recommendations, "
+        "relevance scores, problem-specific explanations, complexity analysis, and Python templates.*"
     )
 
     # ── Image Input ──────────────────────────────────────────────────────────
@@ -522,18 +528,14 @@ def render_mode_2_problem():
         if uploaded_image is not None:
             st.image(uploaded_image, caption="Uploaded Problem Image", use_column_width=True)
             with st.spinner("Extracting text from image..."):
-                ocr_text, ocr_success = extract_text_from_image(uploaded_image)
+                ocr_text, ocr_success, ocr_msg = extract_text_from_image(uploaded_image)
 
             if ocr_success and ocr_text.strip():
-                st.success("✅ Text successfully extracted from image via OCR:")
+                st.success(f"✅ {ocr_msg}")
                 st.code(ocr_text, language="text")
                 st.info("The extracted text has been pre-filled in the problem description below.")
             else:
-                st.warning(
-                    "⚠️ Could not automatically extract text from this image. "
-                    "Please type your problem description manually below. "
-                    "(Install `pytesseract` + Tesseract OCR for automatic image-to-text support.)"
-                )
+                st.warning(f"⚠️ {ocr_msg}")
 
     # ── Preset Example Buttons ────────────────────────────────────────────────
     st.markdown("**Quick Test Examples:**")
@@ -550,7 +552,6 @@ def render_mode_2_problem():
     if ex_col4.button("🎬 Movie Recommender", use_container_width=True):
         prompt_text = "I want to build an AI system that recommends movies to users based on what similar users watched."
 
-    # Additional examples row
     ex_col5, ex_col6, ex_col7, ex_col8 = st.columns(4)
     if ex_col5.button("🏠 House Price Prediction", use_container_width=True):
         prompt_text = "I want to predict house prices based on features like location, size, number of rooms, and age of the property."
@@ -561,6 +562,36 @@ def render_mode_2_problem():
     if ex_col8.button("🌐 Web Crawler (BFS)", use_container_width=True):
         prompt_text = "I need to crawl all pages of a website starting from the root page and visit every linked page exactly once."
 
+    # ── Category Selection Section ─────────────────────────────────────────
+    st.markdown("---")
+    st.markdown("### 🏷️ Category Selection")
+    st.markdown("Select one or multiple primary categories to evaluate candidates within:")
+
+    # Select All / Clear All State Handling
+    if 'cat_select_state' not in st.session_state:
+        st.session_state.cat_select_state = list(PRIMARY_CATEGORIES)
+
+    c_btn1, c_btn2, _ = st.columns([1, 1, 4])
+    if c_btn1.button("Select All Categories", use_container_width=True):
+        st.session_state.cat_select_state = list(PRIMARY_CATEGORIES)
+    if c_btn2.button("Clear All", use_container_width=True):
+        st.session_state.cat_select_state = []
+
+    selected_categories = st.multiselect(
+        "Algorithm Categories to Evaluate:",
+        options=PRIMARY_CATEGORIES,
+        default=st.session_state.cat_select_state,
+        key="mode2_multiselect"
+    )
+
+    if selected_categories:
+        st.caption(f"✓ Searching inside **{len(selected_categories)}** selected category(ies): {', '.join(selected_categories)}")
+    else:
+        st.warning("⚠️ No categories selected. Please select at least one category above.")
+
+    # ── Problem Description Input ──────────────────────────────────────────
+    st.markdown("---")
+    st.markdown("### 📝 Problem Description")
     user_input = st.text_area(
         "Describe your problem or project idea in detail:",
         value=prompt_text,
@@ -571,89 +602,158 @@ def render_mode_2_problem():
         )
     )
 
-    if st.button("🚀 Analyze & Recommend Algorithm", type="primary", use_container_width=True):
+    if st.button("🚀 Analyze Problem & Recommend Algorithms", type="primary", use_container_width=True):
         if not user_input.strip():
             st.warning("Please enter a problem description or project idea.")
             return
 
-        with st.spinner("Analyzing problem requirements & computing semantic embeddings..."):
-            rec_data = recommend_algorithm_from_text(user_input)
+        if not selected_categories:
+            st.error("Please select at least one algorithm category to run recommendation.")
+            return
 
-        analysis = rec_data['analysis']
-        top_algo = rec_data['top_recommendation']
-        top_score = rec_data['top_score']
-        candidates = rec_data['candidates']
+        with st.spinner("Extracting problem representation & ranking category candidates..."):
+            rec_data = recommend_algorithm_from_text(user_input, selected_categories=selected_categories)
+
+        prob_rep = rec_data['problem_representation']
+        cat_recs = rec_data['category_recommendations']
 
         st.markdown("---")
 
-        # 1. TOP RECOMMENDATION HIGHLIGHT
-        st.success(f"### 🏆 Recommended Algorithm: **{top_algo['name']}** (Confidence: {top_score}%)")
-        st.markdown(
-            f"**Category**: `{top_algo['category']}` | "
-            f"**Expected Time Complexity**: `{top_algo['time_complexity']}` | "
-            f"**Space Complexity**: `{top_algo['space_complexity']}`"
-        )
+        # 1. STRUCTURED PROBLEM REPRESENTATION
+        with st.expander("🔍 Structured Problem Representation & Analysis", expanded=True):
+            r1, r2, r3 = st.columns(3)
+            r1.markdown(f"**Detected Categories**: {', '.join(prob_rep['detected_categories'])}")
+            r2.markdown(f"**Data Structures**: {', '.join(prob_rep['data_structures'])}")
+            r3.markdown(f"**Input Characteristics**: {', '.join(prob_rep['input_characteristics'])}")
 
-        # 2. PROBLEM UNDERSTANDING & EXTRACTION
-        with st.expander("🔍 Problem Understanding & Requirements Extraction", expanded=True):
-            p1, p2, p3 = st.columns(3)
-            p1.write(f"**Detected Problem Category**: {analysis['category']}")
-            p2.write(f"**Target Data Structure**: {analysis['data_structure']}")
-            p3.write(
-                f"**Problem Type**: "
-                f"{'Machine Learning / AI Project' if analysis['is_ml_project'] else 'Algorithmic / Computational'}"
-            )
+            r4, r5, r6 = st.columns(3)
+            r4.markdown(f"**Estimated Input Size**: `{prob_rep['input_size']}`")
+            r5.markdown(f"**Optimization Goal**: `{prob_rep['optimization_goal']}`")
+            r6.markdown(f"**Required Output**: `{prob_rep['required_output']}`")
 
-            if analysis['follow_up_questions']:
-                st.info("💡 **Questions that would refine this recommendation further:**")
-                for q in analysis['follow_up_questions']:
+            st.markdown(f"**Detected Constraints**: {', '.join(prob_rep['constraints'])}")
+            st.markdown(f"**Detected Patterns**: `{', '.join(prob_rep['detected_patterns'])}`")
+
+            if prob_rep['follow_up_questions']:
+                st.info("💡 **Follow-up Questions to refine requirements further:**")
+                for q in prob_rep['follow_up_questions']:
                     st.write(f"- {q}")
 
-        # 3. WHY THIS ALGORITHM? (REASONING)
-        st.markdown("### 💡 Why Was This Algorithm Recommended?")
-        st.write(top_algo['description'])
-        st.markdown("**Key Reasons for Match:**")
-        for uc in top_algo['best_use_cases']:
-            st.write(f"- ✅ **Applicability**: {uc}")
-        for req in top_algo['requirements']:
-            st.write(f"- ⚠️ **Requirement/Pre-condition**: {req}")
+        # 2. RELEVANCE SCORE DEFINITION DISCLAIMER
+        st.info(
+            "ℹ️ **Note on Scoring**: Displayed **Relevance / Suitability Scores** represent "
+            "normalized semantic similarity and requirement compatibility ranking measures (50%–98.5%), "
+            "NOT statistical probabilities of correctness."
+        )
 
-        # 4. ALGORITHM CANDIDATES COMPARISON TABLE
-        st.markdown("### 📊 Top Algorithm Candidates & Complexity Comparison")
-        comp_rows = []
-        for item in candidates:
-            a = item['algo']
-            comp_rows.append({
-                "Algorithm": a['name'],
-                "Match Confidence": f"{item['similarity_score']}%",
-                "Category": a['category'],
-                "Time Complexity": a['time_complexity'],
-                "Space Complexity": a['space_complexity'],
-                "Best Use Cases": ", ".join(a['best_use_cases'][:2]),
-                "Limitations": ", ".join(a['limitations'][:1])
-            })
-        st.table(pd.DataFrame(comp_rows))
+        # 3. CATEGORY-SPECIFIC RECOMMENDATIONS
+        st.markdown("## 🏆 Category-Specific Recommendations")
 
-        # 5. ALTERNATIVE ALGORITHMS & TRADE-OFFS
-        st.markdown("### 🔄 Alternatives & Trade-Offs")
-        st.write(f"**Main Alternatives to {top_algo['name']}**:")
-        for alt in top_algo['alternatives']:
-            st.write(f"- **{alt}**: Consider when specific constraints or data structures differ.")
+        for cat_name, cat_data in cat_recs.items():
+            top_a = cat_data['top_recommendation']
+            score = cat_data['relevance_score']
 
-        # 6. PYTHON IMPLEMENTATION TEMPLATE
-        st.markdown("### 🐍 Python Implementation Guidance Template")
-        st.code(top_algo['python_template'], language="python")
+            # Get Supervised ML model predictions for this category
+            ml_preds = predict_top_k_algorithms(user_input, selected_categories=[cat_name], k=3)
+            top_ml_algo = ml_preds[0]['algorithm'] if ml_preds else "N/A"
+            top_ml_prob = ml_preds[0]['ml_probability'] if ml_preds else 0.0
 
-        # 7. IF ML PROJECT — SUGGEST SWITCHING TO MODE 1
-        if analysis['is_ml_project']:
+            with st.expander(f"📌 **{cat_name.upper()}** — Top Pick: **{top_a['name']}** (Suitability Score: {score}%)", expanded=True):
+                st.success(
+                    f"### Recommended Algorithm: **{top_a['name']}**\n"
+                    f"**Semantic Suitability Score**: `{score}%` | "
+                    f"**Supervised ML Model Evidence**: `{top_ml_algo}` (Probability: `{top_ml_prob}%`) | "
+                    f"**Time Complexity**: `{cat_data['time_complexity']}` | "
+                    f"**Space Complexity**: `{cat_data['space_complexity']}`"
+                )
+
+                st.markdown("#### 💡 Problem-Specific Explanation")
+                st.write(cat_data['explanation'])
+
+                col_a, col_b = st.columns(2)
+                with col_a:
+                    st.markdown("**Key Advantages:**")
+                    for adv in cat_data['advantages']:
+                        st.write(f"- ✅ {adv}")
+                with col_b:
+                    st.markdown("**Limitations & Constraints:**")
+                    for lim in cat_data['limitations']:
+                        st.write(f"- ⚠️ {lim}")
+
+                if cat_data['requirements']:
+                    st.markdown("**Requirements & Pre-conditions:**")
+                    for req in cat_data['requirements']:
+                        st.write(f"- 🔑 {req}")
+
+                # Candidate Comparison Table
+                st.markdown("#### 📊 Candidate Comparison Table")
+                comp_rows = []
+                for cand in cat_data['candidates']:
+                    algo = cand['algo']
+                    ml_match = next((p for p in ml_preds if p['algorithm'] == algo['name']), None)
+                    ml_prob_str = f"{ml_match['ml_probability']}%" if ml_match else "N/A"
+                    
+                    comp_rows.append({
+                        "Algorithm": algo['name'],
+                        "Semantic Suitability Score": f"{cand['relevance_score']}%",
+                        "Supervised ML Probability": ml_prob_str,
+                        "Time Complexity": algo['time_complexity'],
+                        "Space Complexity": algo['space_complexity'],
+                        "Best Use Cases": ", ".join(algo.get('best_use_cases', [])[:2]),
+                        "Limitations": ", ".join(algo.get('limitations', [])[:1])
+                    })
+                st.table(pd.DataFrame(comp_rows))
+
+                # Alternatives
+                if cat_data['alternatives']:
+                    st.markdown("**Main Alternatives:** " + ", ".join([f"`{alt}`" for alt in cat_data['alternatives']]))
+
+                # Python Code Template
+                st.markdown("#### 🐍 Python Implementation Template")
+                st.code(top_a['python_template'], language="python")
+
+        # 4. SUPERVISED ML MODEL PROOF & BENCHMARK
+        st.markdown("---")
+        with st.expander("🤖 Supervised ML Model Proof & Benchmark (TF-IDF + Logistic Regression)", expanded=False):
+            st.markdown("""
+            > **Supervised ML Model Proof**: In addition to semantic SentenceTransformer retrieval,
+            > SuggestAlgo AI incorporates an empirical **TF-IDF + Logistic Regression** supervised classifier
+            > trained on a 1,792-sample curated benchmark dataset derived from the 112-algorithm knowledge base.
+            """)
+            
+            m1, m2, m3, m4, m5 = st.columns(5)
+            m1.metric("Training Samples", "1,433 (80%)")
+            m2.metric("Test Samples", "359 (20%)")
+            m3.metric("Algorithm Classes", "112")
+            m4.metric("Test Accuracy", "77.16%")
+            m5.metric("Macro F1 Score", "75.94%")
+            
+            p1, p2, p3 = st.columns(3)
+            p1.write("**Dataset Type**: Curated / Synthetic Algorithm Problem Benchmark")
+            p2.write("**Generation Source**: SuggestAlgo AI Knowledge Base")
+            p3.write("**Random State**: `42` (Stratified Split)")
+            
+            if os.path.exists("results/mode2_confusion_matrix.png"):
+                st.markdown("#### 📊 Mode 2 Classifier Confusion Matrix (112 Classes)")
+                st.image("results/mode2_confusion_matrix.png", use_column_width=True)
+
+            st.caption(
+                "Notice: The current supervised Mode 2 model is trained on a curated benchmark "
+                "generated from the project's algorithm knowledge base. It is intended as a "
+                "proof-of-concept recommendation model and does not claim to represent real-world algorithm usage."
+            )
+
+        # 5. IF ML PROJECT — MODE 1 REDIRECT
+        if prob_rep['is_ml_project']:
             st.markdown("---")
             st.info(
-                "🔄 **This looks like an ML project!** "
-                "Switch to **Mode 1 (Dataset/CSV)** to upload your actual dataset, "
-                "run a full ML benchmarking pipeline with 9 algorithm candidates "
-                "(classification) or 10 regressors, and get SHAP explanations on real data."
+                "🔄 **This problem involves Machine Learning!** "
+                "Switch to **Mode 1 (Dataset/CSV)** to upload your dataset, "
+                "run cross-validation benchmarks across candidate models, and view SHAP explainability plots."
             )
+
 
 
 if __name__ == "__main__":
     main()
+
