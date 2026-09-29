@@ -200,7 +200,15 @@ def predict_top_k_algorithms(problem_text, selected_categories=None, k=3):
     """
     model = load_mode2_model()
     classes = model.classes_
-    probs = model.predict_proba([problem_text])[0]
+    
+    if hasattr(model, 'predict_proba'):
+        probs = model.predict_proba([problem_text])[0]
+    elif hasattr(model, 'decision_function'):
+        scores = model.decision_function([problem_text])[0]
+        from scipy.special import softmax
+        probs = softmax(scores)
+    else:
+        probs = [1.0 / len(classes)] * len(classes)
     
     # Combine algorithm names with predicted model probabilities
     algo_prob_pairs = []
