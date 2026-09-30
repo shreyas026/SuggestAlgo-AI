@@ -692,50 +692,57 @@ def render_mode_1_dataset():
 
         if run_btn or 'mode1_results' not in st.session_state or st.session_state.get('last_dataset') != dataset_name:
             with st.spinner("Processing dataset: Profiling → Preprocessing → Meta-Learning → 5-Fold Cross-Validation → SHAP..."):
-                profile_res = profile_dataset(df)
-                X_proc, y_proc, feat_names, label_enc, prep_info = preprocess_dataset(
-                    df, target_col, problem_type=detected_type
-                )
-                meta_feats = extract_meta_features(df, target_col)
+                try:
+                    profile_res = profile_dataset(df, target_col)
+                    X_proc, y_proc, feat_names, label_enc, prep_info = preprocess_dataset(
+                        df, target_col, problem_type=detected_type
+                    )
+                    meta_feats = extract_meta_features(df, target_col)
 
-                rec_algo, rec_conf = get_meta_learning_recommendation(meta_feats)
-                algo_map = get_algorithm_name_mapping()
-                rec_res = {
-                    'recommended_algo': algo_map.get(rec_algo, rec_algo),
-                    'recommended_algo_raw': rec_algo,
-                    'confidence': rec_conf['confidence'],
-                    'explanation': (
-                        f"Meta-learning KNN identified '{algo_map.get(rec_algo, rec_algo)}' based on "
-                        f"{rec_conf['confidence']:.1f}% weighted neighbor agreement across nearest reference datasets."
-                    ),
-                    'meta_features_used': rec_conf['meta_features_used'],
-                    'neighbor_algorithms': rec_conf['neighbor_algorithms'],
-                }
+                    rec_algo, rec_conf = get_meta_learning_recommendation(meta_feats)
+                    algo_map = get_algorithm_name_mapping()
+                    rec_res = {
+                        'recommended_algo': algo_map.get(rec_algo, rec_algo),
+                        'recommended_algo_raw': rec_algo,
+                        'confidence': rec_conf['confidence'],
+                        'explanation': (
+                            f"Meta-learning KNN identified '{algo_map.get(rec_algo, rec_algo)}' based on "
+                            f"{rec_conf['confidence']:.1f}% weighted neighbor agreement across nearest reference datasets."
+                        ),
+                        'meta_features_used': rec_conf['meta_features_used'],
+                        'neighbor_algorithms': rec_conf['neighbor_algorithms'],
+                    }
 
-                results_dict, comparison_df, best_model_name, split_data = evaluate_all_models(
-                    X_proc, y_proc,
-                    recommended_algo=rec_res['recommended_algo_raw'],
-                    problem_type=detected_type
-                )
+                    results_dict, comparison_df, best_model_name, split_data = evaluate_all_models(
+                        X_proc, y_proc,
+                        recommended_algo=rec_res['recommended_algo_raw'],
+                        problem_type=detected_type
+                    )
 
-                st.session_state.mode1_results = {
-                    'profile_res': profile_res,
-                    'X_proc': X_proc,
-                    'y_proc': y_proc,
-                    'feat_names': feat_names,
-                    'label_enc': label_enc,
-                    'prep_info': prep_info,
-                    'meta_feats': meta_feats,
-                    'rec_res': rec_res,
-                    'results_dict': results_dict,
-                    'comparison_df': comparison_df,
-                    'best_model_name': best_model_name,
-                    'split_data': split_data,
-                    'dataset_name': dataset_name,
-                    'df': df,
-                    'problem_type': detected_type
-                }
-                st.session_state.last_dataset = dataset_name
+                    st.session_state.mode1_results = {
+                        'profile_res': profile_res,
+                        'X_proc': X_proc,
+                        'y_proc': y_proc,
+                        'feat_names': feat_names,
+                        'label_enc': label_enc,
+                        'prep_info': prep_info,
+                        'meta_feats': meta_feats,
+                        'rec_res': rec_res,
+                        'results_dict': results_dict,
+                        'comparison_df': comparison_df,
+                        'best_model_name': best_model_name,
+                        'split_data': split_data,
+                        'dataset_name': dataset_name,
+                        'df': df,
+                        'problem_type': detected_type
+                    }
+                    st.session_state.last_dataset = dataset_name
+                except Exception as e:
+                    st.error(f"Error benchmarking dataset: {e}")
+                    return
+
+        if 'mode1_results' not in st.session_state:
+            return
 
         res = st.session_state.mode1_results
         problem_type = res.get('problem_type', 'classification')
@@ -814,6 +821,12 @@ def render_mode_1_dataset():
                     st.pyplot(fig_imp)
 
         with t3:
+            st.markdown("#### Dataset Intelligence & Overview")
+            if 'profile_res' in res and res['profile_res']:
+                try:
+                    st.dataframe(format_profile_for_display(res['profile_res']), use_container_width=True)
+                except Exception:
+                    pass
             st.markdown("#### Raw Dataset Sample")
             st.dataframe(res['df'].head(10), use_container_width=True)
             st.markdown("#### Statistical Profiling")

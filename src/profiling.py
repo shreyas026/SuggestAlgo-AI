@@ -8,28 +8,31 @@ import pandas as pd
 import numpy as np
 
 
-def profile_dataset(df, target_col):
+def profile_dataset(df, target_col=None):
     """
     Generate a comprehensive dataset profile.
     
     Args:
         df: Input DataFrame
-        target_col: Name of the target column
+        target_col: Name of the target column (optional, defaults to last column)
         
     Returns:
         dict: Profile information
     """
     profile = {}
     
+    if target_col is None or target_col not in df.columns:
+        target_col = df.columns[-1] if len(df.columns) > 0 else "target"
+    
     # Basic dimensions
     profile['n_rows'] = df.shape[0]
     profile['n_cols'] = df.shape[1]
-    profile['n_features'] = df.shape[1] - 1  # Exclude target
+    profile['n_features'] = max(0, df.shape[1] - 1)  # Exclude target
     
     # Target info
     profile['target_col'] = target_col
-    profile['n_classes'] = df[target_col].nunique()
-    profile['class_distribution'] = df[target_col].value_counts().to_dict()
+    profile['n_classes'] = df[target_col].nunique() if target_col in df.columns else 0
+    profile['class_distribution'] = df[target_col].value_counts().to_dict() if target_col in df.columns else {}
     
     # Check class imbalance
     class_counts = df[target_col].value_counts()
