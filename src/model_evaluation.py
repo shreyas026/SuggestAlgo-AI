@@ -105,7 +105,7 @@ def get_candidate_classifiers(n_classes=2, n_samples=100, n_features=10):
         max_depth=None, random_state=RANDOM_STATE
     )
     models['LogisticRegression'] = LogisticRegression(
-        max_iter=max_iter, random_state=RANDOM_STATE, multi_class='auto', solver='lbfgs'
+        max_iter=max_iter, random_state=RANDOM_STATE, solver='lbfgs'
     )
     if n_samples > 5000:
         models['SVC'] = SVC(
@@ -125,7 +125,7 @@ def get_candidate_classifiers(n_classes=2, n_samples=100, n_features=10):
         n_estimators=100, random_state=RANDOM_STATE, algorithm='SAMME'
     )
     models['XGBoost'] = XGBClassifier(
-        n_estimators=100, random_state=RANDOM_STATE, use_label_encoder=False,
+        n_estimators=100, random_state=RANDOM_STATE,
         eval_metric='logloss', verbosity=0
     )
     models['SGDClassifier'] = SGDClassifier(
