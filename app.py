@@ -697,7 +697,7 @@ def render_mode_1_dataset():
                     X_proc, y_proc, feat_names, label_enc, prep_info = preprocess_dataset(
                         df, target_col, problem_type=detected_type
                     )
-                    meta_feats = extract_meta_features(df, target_col)
+                    meta_feats = extract_meta_features(X_proc, y_proc)
 
                     rec_algo, rec_conf = get_meta_learning_recommendation(meta_feats)
                     algo_map = get_algorithm_name_mapping()

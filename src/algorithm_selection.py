@@ -32,15 +32,21 @@ def extract_meta_features(X, y):
     """
     Extract dataset meta-features for algorithm selection.
     
-    Directly adapted from AMLBID's MetafeaturesExtractor.py which computes:
-    - nr_classes, nr_instances, log_nr_instances, nr_features, log_nr_features
-    - dataset_ratio, log_dataset_ratio
-    - Correlation statistics (min, mean, std, max)
-    - Skewness and Kurtosis statistics
-    - Mutual information statistics
-    
-    We extend AMLBID's meta-features with additional landmarking features.
+    Directly adapted from AMLBID's MetafeaturesExtractor.py.
+    Supports both:
+    - extract_meta_features(X, y) where X is feature matrix, y is target Series/array
+    - extract_meta_features(df, target_col) where df is full DataFrame, target_col is column name
     """
+    if isinstance(y, str) and hasattr(X, 'columns') and y in X.columns:
+        target_name = y
+        y = X[target_name].values
+        X = X.drop(columns=[target_name])
+    elif not isinstance(y, np.ndarray):
+        if hasattr(y, 'values'):
+            y = y.values
+        else:
+            y = np.asarray(y)
+
     meta = {}
     
     n_instances, n_features = X.shape
@@ -128,8 +134,11 @@ def extract_meta_features(X, y):
             meta[key] = 0
     
     # === Class balance features ===
-    class_counts = np.bincount(y.astype(int)) if y.dtype in [np.int32, np.int64, int] else np.array([np.sum(y == c) for c in np.unique(y)])
-    class_probs = class_counts / len(y)
+    if hasattr(y, 'dtype') and np.issubdtype(y.dtype, np.integer):
+        class_counts = np.bincount(y.astype(int))
+    else:
+        _, class_counts = np.unique(y, return_counts=True)
+    class_probs = class_counts / max(len(y), 1)
     meta['class_entropy'] = -np.sum(class_probs * np.log2(class_probs + 1e-10))
     meta['class_imbalance'] = np.max(class_probs) / max(np.min(class_probs), 1e-10)
     
