@@ -1,136 +1,118 @@
-# 🧠 SuggestAlgo AI — Explainable AI Assistant for Algorithm Selection
+﻿# 🧠 SuggestAlgo AI — Explainable AI Assistant for Algorithm Selection
 
-<p align="center">
-  <strong>An intelligent, category-aware Explainable AI system that recommends optimal algorithms from CSV datasets, computational problems, and AI project ideas.</strong>
-</p>
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![CI](https://github.com/shreyas026/SuggestAlgo-AI/actions/workflows/ci.yml/badge.svg)](https://github.com/shreyas026/SuggestAlgo-AI/actions)
+[![Stars](https://img.shields.io/github/stars/shreyas026/SuggestAlgo-AI?style=social)](https://github.com/shreyas026/SuggestAlgo-AI/stargazers)
+[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.35+-red.svg)](https://streamlit.io)
+
+**An intelligent, category-aware Explainable AI (XAI) system that recommends optimal algorithms from CSV datasets, computational problems, and AI project ideas.**
 
 ---
 
 ## 🌟 Overview & Operational Modes
 
-**SuggestAlgo AI** is an academic Explainable AI (XAI) algorithm recommendation assistant that operates across two primary input modes:
-
 ### 📊 Mode 1 — Dataset / CSV Recommendation & ML Benchmarking
-- **Workflow**: `Dataset CSV -> Profiling -> Task Auto-Detection -> Meta-Feature Extraction -> Candidate Model Pool -> 5-Fold Cross Validation -> Metrics -> SHAP Explainability -> CSV Export`
-- **Supported Task Types**: Automatically detects **Classification** (binary & multi-class) and **Regression** tasks.
-- **Classification Candidate Pool**: Random Forest, Decision Tree, Logistic Regression, SVC, Extra Trees, Gradient Boosting, AdaBoost, XGBoost, SGD Classifier.
-- **Regression Candidate Pool**: Linear Regression, Ridge, Lasso, ElasticNet, Polynomial Regression, Decision Tree Regressor, Random Forest Regressor, Extra Trees Regressor, Gradient Boosting Regressor, Support Vector Regressor (SVR), XGBoost Regressor.
-- **Validation & Metrics**: 5-Fold Cross Validation benchmark (Accuracy, F1-Score, Precision, Recall, R² Score, MAE, RMSE).
-- **Explainability**: SHAP (SHapley Additive exPlanations) summary plots and feature importance rankings.
+- **Workflow**: Dataset CSV → Profiling → Task Auto-Detection → Meta-Feature Extraction → Candidate Model Pool → 5-Fold CV → Metrics → SHAP Explainability → CSV Export
+- **Task Types**: Classification (binary & multi-class) & Regression
+- **Candidate Pool**: 9 classifiers + 11 regressors (RF, XGBoost, SVM, etc.)
+- **Validation**: 5-Fold Cross Validation (Accuracy, F1, Precision, Recall, R², MAE, RMSE)
+- **Explainability**: SHAP summary plots & feature importance rankings
 
 ### 💡 Mode 2 — Category-Aware Problem & Project Idea Recommendation
-- **Workflow**: `Text/Image Input -> OCR -> Structured Problem Representation -> Category Selection -> Semantic Retrieval / Supervised ML Classifier -> Category-Specific Recommendations`
-- **Supervised ML Model Pipeline**: `Curated Dataset (1,792 samples) -> 80/20 Stratified Split -> TF-IDF (1-2 N-Grams) -> Logistic Regression -> Unseen Test Set Evaluation (77.16% Accuracy, 75.94% Macro F1)`
-- **Standardized Categories**: 10 primary categories (Searching, Sorting, Classification, Regression, Graph Algorithms, Tree Algorithms, Dynamic Programming, Greedy Algorithms, Backtracking, Machine Learning / AI).
-- **Knowledge Base**: 112+ algorithms with full structured metadata (10-15 algorithms per primary category).
-- **OCR Integration**: Supports image upload with graceful fallback if system Tesseract binary is uninstalled.
-- **Scoring Definition**: Uses a transparent **Relevance / Suitability Score** combining semantic cosine embeddings and requirement matching alongside **Supervised ML Model Probabilities**.
-
-> *The current supervised Mode 2 model is trained on a curated benchmark generated from the project's algorithm knowledge base. It is intended as a proof-of-concept recommendation model and does not claim to represent real-world algorithm usage.*
-
----
-
-
-## 🔑 Terminology & Concepts
-
-- **Algorithm**: A step-by-step computational procedure or data structure technique for solving a problem (e.g., *Binary Search*, *Dijkstra's Algorithm*, *QuickSort*).
-- **Machine Learning Algorithm**: A data-driven model learning parameters from features (e.g., *Random Forest*, *Logistic Regression*, *Gradient Boosting*).
-- **Trained ML Model**: An instantiated algorithm fitted on a specific dataset with optimized weights and hyperparameters.
-- **Relevance / Suitability Score**: A normalized ranking metric (50%–98.5%) measuring semantic query similarity and problem requirement compatibility. *It is a relative suitability ranking metric, NOT a statistical probability of correctness.*
+- **Workflow**: Text/Image Input → OCR → Structured Problem → Category Selection → Semantic/ML Retrieval → Category-Specific Recommendations
+- **Supervised ML Pipeline**: 1,792 samples → TF-IDF → Logistic Regression → 77.16% Accuracy, 75.94% Macro F1
+- **Categories**: 10 primary (Searching, Sorting, Classification, Regression, Graph, Tree, DP, Greedy, Backtracking, ML/AI)
+- **Knowledge Base**: 112+ algorithms with full metadata
+- **OCR**: Tesseract integration with graceful fallback
 
 ---
 
 ## 🏗️ System Architecture
 
-```
-                                 SUGGESTALGO AI
-                                       │
-            ┌──────────────────────────┴──────────────────────────┐
-            ▼                                                     ▼
-     📊 MODE 1: DATASET / CSV                              💡 MODE 2: PROBLEM / IDEA
-            │                                                     │
-     CSV File + Target                                    Text / Image Problem Statement
-            │                                                     │
-     Task Auto-Detection                                  OCR Extraction (Pytesseract)
- (Classification / Regression)                                    │
-            │                                           Structured Problem Representation
-    Dataset Profiling                                   (Data Struct, Constraints, Size, Goal)
-            │                                                     │
-   Meta-Feature Extraction                                Category Selection Filter
-   (Skewness, Entropy, Ratio)                               (10 Primary Categories)
-            │                                                     │
-   KNN Meta-Learning Match                             Semantic Sentence Transformers / TF-IDF
-            │                                                     │
- 5-Fold Cross-Validation                               Transparent Suitability Scoring
-  (9 Classifiers / 11 Regressors)                         (Semantic Match + Requirement Boost)
-            │                                                     │
-   SHAP Explainability Plots                             Category-Specific Top Recommendations
-            │                                            (Why Selected, Complexity, Python Code)
-   CSV Download Benchmark
-```
+`
+                              SUGGESTALGO AI
+                                    │
+            ┌───────────────────────┴───────────────────────┐
+            ▼                                               ▼
+     📊 MODE 1: DATASET / CSV                          💡 MODE 2: PROBLEM / IDEA
+            │                                               │
+     CSV File + Target                              Text / Image Input
+            │                                               │
+     Task Auto-Detection                            OCR Extraction
+     (Classification / Regression)                       │
+            │                                    Structured Problem
+     Dataset Profiling                                Representation
+            │                                               │
+     Meta-Feature Extraction                       Category Selection
+     (Skewness, Entropy, Ratio)                      (10 Categories)
+            │                                               │
+     KNN Meta-Learning Match                     Semantic / TF-IDF
+            │                                               │
+     5-Fold CV (9 Clf / 11 Reg)                   Transparent Scoring
+            │                                               │
+     SHAP Explainability                         Category-Specific
+     CSV Download                                 Recommendations
+`
 
 ---
 
 ## 🏷️ Standardized 10 Primary Categories
 
-SuggestAlgo AI maps all algorithms into 10 primary categories:
-
-1. **Searching**: Linear Search, Binary Search, Jump Search, Interpolation Search, Exponential Search, Fibonacci Search, Ternary Search, Hash Table Lookup, BFS Search, DFS Search, Two Pointer Search, Sliding Window Search.
-2. **Sorting**: Bubble Sort, Selection Sort, Insertion Sort, Merge Sort, Quick Sort, Heap Sort, Counting Sort, Radix Sort, Bucket Sort, Shell Sort, TimSort.
-3. **Classification**: Logistic Regression, Decision Tree Classifier, Random Forest Classifier, Extra Trees Classifier, Gradient Boosting Classifier, AdaBoost Classifier, SVC, KNN, Naive Bayes Classifier, SGD Classifier, XGBoost Classifier.
-4. **Regression**: Linear Regression, Ridge, Lasso, ElasticNet, Polynomial Regression, Decision Tree Regressor, Random Forest Regressor, Extra Trees Regressor, Gradient Boosting Regressor, SVR, XGBoost Regressor.
-5. **Graph Algorithms**: BFS Graph, DFS Graph, Dijkstra's Algorithm, Bellman-Ford, Floyd-Warshall, A* Search, Prim's Algorithm, Kruskal's Algorithm, Topological Sort, Union-Find, Johnson's Algorithm.
-6. **Tree Algorithms**: Binary Search Tree, AVL Tree, Red-Black Tree, Binary Tree Traversal, Level Order Traversal, Trie (Prefix Tree), Binary Heap, Segment Tree, Fenwick Tree (BIT), Lowest Common Ancestor.
-7. **Dynamic Programming**: 0/1 Knapsack, Unbounded Knapsack, Coin Change, Longest Common Subsequence (LCS), Longest Increasing Subsequence (LIS), Edit Distance, Matrix Chain Multiplication, Rod Cutting, Grid Path DP, Interval DP, Bitmask DP.
-8. **Greedy Algorithms**: Activity Selection, Fractional Knapsack, Huffman Coding, Job Sequencing with Deadlines, Interval Scheduling, Jump Game, Gas Station Problem, Kruskal's MST (Greedy), Prim's MST (Greedy), Dijkstra (Greedy), Minimum Spanning Tree Strategy.
-9. **Backtracking**: N-Queens, Sudoku Solver, Rat in a Maze, Permutations, Combinations, Subsets (Power Set), Combination Sum, Graph Coloring, Hamiltonian Path, Word Search Grid, Knight's Tour.
-10. **Machine Learning / AI**: K-Means, DBSCAN, Hierarchical Clustering, PCA, Naive Bayes ML, Multilayer Perceptron (MLP), CNN, RNN, LSTM, Transformer, Content-Based Recommendation, Collaborative Filtering, Hybrid Recommendation.
+1. **Searching**: Linear, Binary, Jump, Interpolation, Exponential, Fibonacci, Ternary, Hash Table, BFS, DFS, Two Pointer, Sliding Window
+2. **Sorting**: Bubble, Selection, Insertion, Merge, Quick, Heap, Counting, Radix, Bucket, Shell, TimSort
+3. **Classification**: Logistic Regression, Decision Tree, Random Forest, Extra Trees, Gradient Boosting, AdaBoost, SVC, KNN, Naive Bayes, SGD, XGBoost
+4. **Regression**: Linear, Ridge, Lasso, ElasticNet, Polynomial, Decision Tree, Random Forest, Extra Trees, Gradient Boosting, SVR, XGBoost
+5. **Graph Algorithms**: BFS, DFS, Dijkstra, Bellman-Ford, Floyd-Warshall, A*, Prim, Kruskal, Topological Sort, Union-Find, Johnson
+6. **Tree Algorithms**: BST, AVL, Red-Black, Traversals, Trie, Heap, Segment Tree, Fenwick Tree, LCA
+7. **Dynamic Programming**: 0/1 Knapsack, Coin Change, LCS, LIS, Edit Distance, Matrix Chain, Rod Cutting, Grid Path, Interval DP, Bitmask DP
+8. **Greedy Algorithms**: Activity Selection, Fractional Knapsack, Huffman Coding, Job Sequencing, Interval Scheduling, Jump Game, Gas Station, MST Strategies
+9. **Backtracking**: N-Queens, Sudoku, Rat in Maze, Permutations, Combinations, Subsets, Combination Sum, Graph Coloring, Hamiltonian Path, Word Search, Knight's Tour
+10. **Machine Learning / AI**: K-Means, DBSCAN, Hierarchical Clustering, PCA, Naive Bayes, MLP, CNN, RNN, LSTM, Transformer, Recommendation Systems
 
 ---
 
 ## ⚙️ Installation & Execution
 
 ### 1. Clone & Install Dependencies
-
-```bash
+`ash
 git clone https://github.com/shreyas026/SuggestAlgo-AI.git
 cd SuggestAlgo-AI
 pip install -r requirements.txt
-```
+`
 
 ### 2. Optional: Tesseract OCR Setup (for Image-to-Text in Mode 2)
-
-- **Windows**: Download Tesseract installer from [UB-Mannheim Tesseract](https://github.com/UB-Mannheim/tesseract/wiki) and add `C:\Program Files\Tesseract-OCR` to system PATH.
-- **Linux (Ubuntu/Debian)**: `sudo apt-get install tesseract-ocr`
-- **macOS**: `brew install tesseract`
-
-*Note: If Tesseract is not installed, Mode 2 remains fully operational via text input, and gracefully displays diagnostic guidance.*
+- **Windows**: Download from [UB-Mannheim Tesseract](https://github.com/UB-Mannheim/tesseract/wiki) → Add to PATH
+- **Linux**: sudo apt-get install tesseract-ocr
+- **macOS**: rew install tesseract
 
 ### 3. Run Test Suite
-
-```bash
+`ash
 python -X utf8 tests/test_pipeline.py
 python -X utf8 tests/test_mode2_category.py
-```
+`
 
 ### 4. Launch Application
-
-```bash
+`ash
 streamlit run app.py
-```
-
-Navigate to `http://localhost:8501`.
-
----
-
-## 🔬 Academic Foundation & Attribution
-
-SuggestAlgo AI adapts its foundational meta-learning algorithm candidate pool and explainability framework from:
-- **AMLBID**: Automated Machine Learning with Big Data Meta-Learning & Explainability by *LeMGarouani et al.* ([GitHub Repo](https://github.com/LeMGarouani/AMLBID)).
+`
+Navigate to http://localhost:8501
 
 ---
 
-## 🌐 Public Deployment & Repository
+## 🔬 Academic Foundation
+Adapted from **AMLBID**: Automated Machine Learning with Big Data Meta-Learning & Explainability by *LeMGarouani et al.* ([GitHub](https://github.com/LeMGarouani/AMLBID))
 
-- **GitHub Repository**: [https://github.com/shreyas026/SuggestAlgo-AI](https://github.com/shreyas026/SuggestAlgo-AI)
-- **Live Application**: [https://suggestalgo-ai.streamlit.app](https://suggestalgo-ai.streamlit.app)
+---
+
+## 🌐 Links
+- **Repository**: https://github.com/shreyas026/SuggestAlgo-AI
+- **Live Demo**: https://suggestalgo-ai.streamlit.app
+
+---
+
+## 🤝 Contributing
+See [CONTRIBUTING.md](CONTRIBUTING.md)
+
+## 📄 License
+MIT License — see [LICENSE](LICENSE)
